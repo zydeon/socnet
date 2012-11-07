@@ -21,13 +21,13 @@ public class Login extends HttpServlet {
 				Statement st = con.createStatement();
 				ResultSet rs;
 
-				sql = "SELECT salt FROM \"User\" WHERE login='"+user+"';";
+				sql = "SELECT salt FROM \"user\" WHERE login='"+user+"';";
 				rs = st.executeQuery(sql);
 				if(rs.next()){
 					String salt = rs.getString("salt");
 					String hash = Database.generateHash(pass, salt);
 
-					sql = "SELECT login FROM \"User\" WHERE login='"+user+"' AND pass='"+hash+"'";
+					sql = "SELECT login FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
 					rs = st.executeQuery(sql);
 					if( rs.next() )
 						out.println("Login successful !");

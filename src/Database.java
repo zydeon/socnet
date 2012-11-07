@@ -17,10 +17,11 @@ public class Database{
 	private static Pool connectionsPool;
 
 	public static void init(){
-		connectionsPool = new Pool(MAX_CONNECTIONS);
-		initialized = true;
-
-		System.out.println("Database initialized!! ");
+		if(!initialized){
+			connectionsPool = new Pool(MAX_CONNECTIONS);
+			initialized = true;
+			System.out.println("Database initialized!! ");
+		}
 	}
 
 	public static Connection createConnection(){
@@ -63,7 +64,7 @@ public class Database{
 	public static synchronized String generateHash(String password, String salt) throws java.security.NoSuchAlgorithmException {
 		MessageDigest digest = MessageDigest.getInstance("SHA-256");
 		digest.reset();
-		// REVER ISTO 
+		// REVER ISTO
 		digest.update(salt.getBytes());
 		return bytesToHex( digest.digest(password.getBytes()) );
 	}

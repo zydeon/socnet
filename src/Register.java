@@ -34,7 +34,7 @@ public class Register extends HttpServlet {
 		Connection con = Database.getConnection();
 		if(con != null){
 			try{
-				String sql = "SELECT login FROM \"User\" WHERE login='"+user+"'";
+				String sql = "SELECT login FROM \"user\" WHERE login='"+user+"'";
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
 				if( rs.next() )
@@ -48,7 +48,7 @@ public class Register extends HttpServlet {
 					System.out.println(salt);
 					System.out.println(hash);
 
-					sql =  "INSERT INTO \"User\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
+					sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
 					sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+",'"+birthdate+"','"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
 
 					out.println(sql);
