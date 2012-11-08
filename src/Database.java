@@ -82,4 +82,27 @@ public class Database{
 		}
 		return res;
 	}
+
+	public static ArrayList<String> getCountries(){
+		ArrayList<String> countries = new ArrayList<String>();
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT name FROM country;";
+				String country;
+				ResultSet rs = st.executeQuery(query);
+				while( rs.next() ){
+					countries.add( rs.getString("name") );
+				}	
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}
+
+
+		return countries;
+	}
 }
