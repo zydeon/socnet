@@ -63,9 +63,9 @@ writeDays();
 Gender:
 M <input type="radio" name="gender" value="male">
 F <input type="radio" name="gender" value="female">   <br>
-Public: Yes <input type="checkbox" name="public">
+Public: <input type="checkbox" name="public">
 
-<select>
+<select name="country">
 <option selected="selected">Country</option>
 <%
 	int i;
