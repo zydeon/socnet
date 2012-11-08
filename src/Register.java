@@ -68,7 +68,32 @@ public class Register extends HttpServlet {
 		}
 		else
 			System.out.println("Error connecting to database");
-
-
 	}	
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		PrintWriter out = response.getWriter();		
+		out.println( 
+
+			<h1>soc.net</h1>
+			<form action="register" method="post" >
+				User: <input type="text" name="user"> <br>
+				Password: <input type="password" name="password"> <br>
+				Name: <input type="text" name="name"> <br>
+				<!-- Birthday: <input type="text" name="name"> <br> -->
+				Email: <input type="text" name="email"> <br>
+				Address: <input type="text" name="address"> <br>
+				Gender: M <input type="radio" name="gender_male">
+						F <input type="radio" name="gender_female">   <br>
+				Public: Yes <input type="checkbox" name="public">
+
+
+				<br>
+				<br>
+				<br>
+				<input type="submit" name="register" value="Register">
+			</form>
+
+		);
+	}
+
 }
