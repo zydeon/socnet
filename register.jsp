@@ -18,7 +18,7 @@ ArrayList<String> countries = Database.getCountries();
 <input type="text" name="city" placeholder = "City"> 
 
 <select name="country">
-<option selected="selected">Country</option>
+<option selected="selected" value="none">Country</option>
 <%
 	int i;
 	for( i = 0; i < countries.size(); ++i ){

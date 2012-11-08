@@ -14,18 +14,30 @@ public class Register extends HttpServlet {
 		String user      = request.getParameter("user");
 		String pass      = request.getParameter("password");
 		String name = request.getParameter("name");
-		String country = request.getParameter("country").toUpperCase();
-		String city = request.getParameter("city").toUpperCase();
+
+		String country = request.getParameter("country"); //.toUpperCase();
+		String city = request.getParameter("city"); //.toUpperCase();
+
+		Integer id_city = null;
+		Integer id_country = null;
+
+		String day = request.getParameter("day");
+		String month = request.getParameter("month");
+		String year = request.getParameter("year");
+
+		System.out.println(day);
+		System.out.println(year);
+		System.out.println(month);
+
+		String birthdate = null; //new Date();
 
 
-		int id_city = 1;
-		int id_country = 1;
-		String birthdate = "2012-11-4"; //new Date();
 		String email = request.getParameter("email");
 		String address = request.getParameter("address");
-		boolean gender_male;
-
-		gender_male = request.getParameter("gender").equals("male");
+		Boolean gender_male = null;
+		if( request.getParameter("gender") != null )
+			gender_male = request.getParameter("gender").equals("male");
+		
 		boolean public_ = request.getParameter("public") != null;
 
 		Connection con = Database.getConnection();
@@ -34,50 +46,54 @@ public class Register extends HttpServlet {
 				String sql = "SELECT login FROM \"user\" WHERE login='"+user+"'";
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
+
 				if( rs.next() )
 					out.println("Username already exists (redirect to register.html)!");
-				else{
+				else if( !country.equals("none") ) {
 
-
-
-					sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
+					sql = "SELECT id_country FROM \"country\" WHERE name='"+country+"';";
 					rs = st.executeQuery(sql);
-					// if alreay exists
-					if( rs.next() ){
-						id_city = rs.getInt("id_city");
+					if (rs.next()) 
 						id_country = rs.getInt("id_country");
-					}
-					else{
-						// get id_country
-						sql = "SELECT id_country FROM \"country\" WHERE name = '"+country+"';";
+
+					if( !city.equals("") ){
+
+						sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
 						rs = st.executeQuery(sql);
-						if( rs.next() )
-							id_country = rs.getInt("id_country");
-			
-						sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
-						st.executeUpdate(sql);
-						sql = "SELECT id_city FROM city WHERE name='"+city+"';";
-						rs = st.executeQuery(sql);
-						if(rs.next())
+						// if alreay exists
+						if( rs.next() ){
 							id_city = rs.getInt("id_city");
+							id_country = rs.getInt("id_country");
+						}
+						else{				
+							sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
+							st.executeUpdate(sql);
+							sql = "SELECT id_city FROM city WHERE name='"+city+"';";
+							rs = st.executeQuery(sql);
+							if(rs.next())
+								id_city = rs.getInt("id_city");
+						}
 					}
-
-					// generate salt
-					String salt = Database.generateSalt();						
-					String hash = Database.generateHash(pass, salt);
-
-					System.out.println(salt);
-					System.out.println(hash);
-
-					sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
-					sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+",'"+birthdate+"','"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
-
-					out.println(sql);
-					st.executeUpdate(sql);
-					out.println("\nRegister successful! (redirect to index.html)");						
-					
 				}
 
+				// generate salt
+				String salt = Database.generateSalt();						
+				String hash = Database.generateHash(pass, salt);
+
+				System.out.println(salt);
+				System.out.println(hash);
+
+				if (!birthdate.equals(""))
+					birthdate="'"+birthdate+"'";
+
+				sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
+				sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
+
+				out.println(sql);
+				st.executeUpdate(sql);
+				out.println("\nRegister successful! (redirect to index.html)");						
+					
+				
 				Database.putConnection(con);
 			}
 			catch(SQLException e){
