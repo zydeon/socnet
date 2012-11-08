@@ -16,16 +16,12 @@ ArrayList<String> countries = Database.getCountries();
 <!-- Birthday: <input type="text" name="name"> <br> -->
 Birthday:
 <select name="year" id="year" size="1">
-<script language="JavaScript">
-function writeYears(){
-	var text="";
-	text+="<option value=\" \" selected=\"selected\"> Year</option>";
-	for(var i=1950;i<=2012;i++)
-	text+="<option value=\""+i+"\">"+i+"</option>";
-	document.write(text);
-}
-writeYears();
-</script>
+<%
+   int y;
+   out.println("<option value=\" \" selected=\"selected\"> Year</option>");
+   for(y=1950;y<=2012;y++)
+	       out.println("<option value=\""+y+"\">"+y+"</option>");
+%>
 </select>
 <select name="month" id="month" size="1">
 <option value=" " selected="selected"> Month</option>
@@ -44,16 +40,12 @@ writeYears();
 </select>
 
 <select name="day" id="day" size="1">
-<script language="JavaScript">
-function writeDays(){
-	var text="";
-	text+="<option value=\" \" selected=\"selected\"> Day</option>";
-	for(var i=1;i<=31;i++)
-	text+="<option value=\""+i+"\">"+i+"</option>";
-	document.write(text);
-}
-writeDays();
-</script>
+<%
+   int d;
+   out.println("<option value=\" \" selected=\"selected\"> Day</option>");
+   for(d=1;d<=31;d++)
+	       out.println("<option value=\""+d+"\">"+d+"</option>");
+%>
 </select>
 <br>
 <input type="text" name="email" placeholder="Email"> <br>
@@ -93,7 +85,7 @@ function setDayDrop(dyear, dmonth, dday) {
 	var day = dday.options[dday.selectedIndex].value;
 	var days = (year == ' ' || month == ' ') ? 31 : daysInMonth(month,year);
 	dday.options.length = 0;
-	dday.options[dday.options.length] = new Option(' ',' ');
+	dday.options[dday.options.length] = new Option('Day',' ');
 	for (var i = 1; i <= days; i++)
 	dday.options[dday.options.length] = new Option(i,i);
 }
