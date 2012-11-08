@@ -26,10 +26,8 @@
 	<input type="text" name="name" placeholder="Name"> <br>
 	<input type="text" name="email" placeholder="Email"> <br>
 	<input type="text" name="address" placeholder = "Adress"> <br>
-	<input type="text" name="city" placeholder = "City" id="city"> 
 
-
-	<select name="country">
+	<select name="country" onchange="hiddenCity()">
 		<option selected="selected" value="none">Country</option>
 		<%
 			int i;
@@ -37,6 +35,8 @@
 				out.println( "<option value='"+countries.get(i)+"'>"+countries.get(i)+"</option>" );
 		%> 
 	</select>
+
+	<input type="text" name="city" placeholder = "City" id="city" style="visibility:hidden"> 	
 
 	<br>
 	<br>
@@ -133,6 +133,11 @@
 		var month = document.getElementById('month');
 		var day = document.getElementById('day');
 		setDayDrop(year,month,day);
+	}
+
+	function hiddenCity(){
+		document.getElementById('city').style.display='inline';
+		document.getElementById('city').style.visibility='visible';
 	}
 
 	document.getElementById('year').onchange = setDay;
