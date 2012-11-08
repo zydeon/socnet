@@ -45,49 +45,48 @@ public class Register extends HttpServlet {
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
 
-				if( rs.next() )
-					out.println("Username already exists (redirect to register.html)!");
-				else if( !country.equals("none") ) {
+				if( rs.next() ){
+					response.sendRedirect("register.jsp?msg=User already exists");
+				}
+				else {
+					if( !country.equals("none") ) {
 
-					sql = "SELECT id_country FROM \"country\" WHERE name='"+country+"';";
-					rs = st.executeQuery(sql);
-					if (rs.next()) 
-						id_country = rs.getInt("id_country");
-
-					if( !city.equals("") ){
-
-						sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
+						sql = "SELECT id_country FROM \"country\" WHERE name='"+country+"';";
 						rs = st.executeQuery(sql);
-						// if alreay exists
-						if( rs.next() ){
-							id_city = rs.getInt("id_city");
+						if (rs.next()) 
 							id_country = rs.getInt("id_country");
-						}
-						else{				
-							sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
-							st.executeUpdate(sql);
-							sql = "SELECT id_city FROM city WHERE name='"+city+"';";
+
+						if( !city.equals("") ){
+
+							sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
 							rs = st.executeQuery(sql);
-							if(rs.next())
+							// if alreay exists
+							if( rs.next() ){
 								id_city = rs.getInt("id_city");
+								id_country = rs.getInt("id_country");
+							}
+							else{				
+								sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
+								st.executeUpdate(sql);
+								sql = "SELECT id_city FROM city WHERE name='"+city+"';";
+								rs = st.executeQuery(sql);
+								if(rs.next())
+									id_city = rs.getInt("id_city");
+							}
 						}
 					}
+
+					// generate salt
+					String salt = Database.generateSalt();						
+					String hash = Database.generateHash(pass, salt);
+
+					sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
+					sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
+
+					st.executeUpdate(sql);
+					out.println("\nRegister successful!");
+					out.flush();
 				}
-
-				// generate salt
-				String salt = Database.generateSalt();						
-				String hash = Database.generateHash(pass, salt);
-
-				System.out.println(salt);
-				System.out.println(hash);
-
-				sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
-				sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
-
-				out.println(sql);
-				st.executeUpdate(sql);
-				out.println("\nRegister successful! (redirect to index.html)");						
-					
 				
 				Database.putConnection(con);
 			}
@@ -98,8 +97,12 @@ public class Register extends HttpServlet {
 				System.out.println(e);
 			}
 		}
-		else
-			System.out.println("Error connecting to database");
+
+		try{
+			response.sendRedirect("register.jsp?msg=Problems with connection or database!");
+		}
+		catch(java.lang.IllegalStateException e){}
+
 	}
 
 }

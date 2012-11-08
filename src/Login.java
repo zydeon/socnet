@@ -29,18 +29,18 @@ public class Login extends HttpServlet {
 
 					sql = "SELECT login FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
 					rs = st.executeQuery(sql);
-					if( rs.next() )
+					if( rs.next() ){
 						out.println("Login successful !");
+						out.flush();
+					}
 					else
-						out.println("Wrong username or password!");
+						response.sendRedirect("login.jsp?msg=Wrong username or password");
 				}	
 				else
-					out.println("Wrong username or password!");
+					response.sendRedirect("login.jsp?msg=Wrong username or password");
 
 				Database.putConnection(con);
-			}
-			else
-				System.out.println("Error connecting to database");			
+			}		
 		}
 		catch(SQLException e){
 			System.out.println(e);
@@ -48,5 +48,10 @@ public class Login extends HttpServlet {
 		catch(java.security.NoSuchAlgorithmException e){
 			System.out.println(e);
 		}
+
+		try{
+			response.sendRedirect("login.jsp?msg=Problems with connection or database!");
+		}
+		catch(java.lang.IllegalStateException e){}		
 	}	
 }
