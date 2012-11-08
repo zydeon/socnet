@@ -94,7 +94,7 @@ function checkfields(){
     }
     
     if(document.getElementById('password').value != document.getElementById('cpassword').value) { 
-	alert("Your password and confirmation password do not match.");
+	alert("Your Passwords do not match.");
 	document.getElementById('password').focus();
 	return false; 
     }
