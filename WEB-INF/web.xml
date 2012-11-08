@@ -18,6 +18,7 @@
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
 
+
     <!-- REGISTER -->
     <servlet>
         <servlet-name>Register</servlet-name>
@@ -27,6 +28,14 @@
     <servlet-mapping>
         <servlet-name>Register</servlet-name>
         <url-pattern>/register</url-pattern>
-    </servlet-mapping>    
+    </servlet-mapping>   
+
+
+    <!-- DATABASE -->
+    <servlet>
+        <servlet-name>DatabaseInitializer</servlet-name>
+        <servlet-class>DatabaseInitializer</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
 </web-app>

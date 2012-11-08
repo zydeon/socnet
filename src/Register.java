@@ -25,11 +25,9 @@ public class Register extends HttpServlet {
 		String month = request.getParameter("month");
 		String year = request.getParameter("year");
 
-		System.out.println(day);
-		System.out.println(year);
-		System.out.println(month);
-
-		String birthdate = null; //new Date();
+		String birthdate = null;
+		if( !day.equals("none") && !month.equals("none") && !year.equals("none") )
+			birthdate = "'"+year+"-"+month+"-"+day+"'";
 
 
 		String email = request.getParameter("email");
@@ -83,9 +81,6 @@ public class Register extends HttpServlet {
 				System.out.println(salt);
 				System.out.println(hash);
 
-				if (!birthdate.equals(""))
-					birthdate="'"+birthdate+"'";
-
 				sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
 				sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
 
@@ -105,50 +100,6 @@ public class Register extends HttpServlet {
 		}
 		else
 			System.out.println("Error connecting to database");
-	}	
-
-	// public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	// 	PrintWriter out = response.getWriter();
-	// 	Connection con;
-	// 	Statement st;
-	// 	ResultSet rs = null;
-	// 	String country;
-
-	// 	try{
-	// 		con = Database.getConnection();
-	// 		st = con.createStatement();
-	// 		String sql = "SELECT name FROM country;";
-	// 		rs = st.executeQuery(sql);
-
-	// 		out.println("<h1>soc.net</h1>");
-	// 		out.println("<form action=\"register\" method=\"post\" >");
-	// 		out.println("User: <input type=\"text\" name=\"user\"> <br>");
-	// 		out.println("Password: <input type=\"password\" name=\"password\"> <br>");
-	// 		out.println("Name: <input type=\"text\" name=\"name\"> <br>");
-	// 		out.println("<!-- Birthday: <input type=\"text\" name=\"name\"> <br> -->");
-	// 		out.println("Email: <input type=\"text\" name=\"email\"> <br>");
-	// 		out.println("Address: <input type=\"text\" name=\"address\"> <br>");
-	// 		out.println("Gender: M <input type=\"radio\" name=\"gender_male\">");
-	// 		out.println("		F <input type=\"radio\" name=\"gender_female\">   <br>");
-	// 		out.println("Public: Yes <input type=\"checkbox\" name=\"public\">");
-
-	// 		// COUNTRIES
-	// 		out.println("<select>");
-	// 		while( rs.next() ){
-	// 			country = rs.getString("name");
-	// 			out.println( "<option value='"+country+"'>"+country+"</option>" );
-	// 		}
-	// 		out.println("</select>");		
-
-	// 		out.println("<br>");
-	// 		out.println("<br>");
-	// 		out.println("<br>");
-	// 		out.println("<input type=\"submit\" name=\"register\" value=\"Register\">");
-	// 		out.println("</form>");
-	// 	}
-	// 	catch( java.sql.SQLException e){
-	// 		System.out.println(e);
-	// 	}
-	// }
+	}
 
 }

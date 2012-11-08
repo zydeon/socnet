@@ -4,6 +4,6 @@
 <%@ include file="login.html" %>
 
 <%
-	Database.init();
+	//Database.init();
 
 %>
