@@ -11,16 +11,33 @@ ArrayList<String> countries = Database.getCountries();
 <form action="register" method="post" >
 <input type="text" name="user" placeholder="Username"> <br>
 <input type="password" name="password" placeholder="Password"> <br>
-<!-- Confirm password: <input type="password" name="password"> <br> -->
+<input type="password" name="cpassword" placeholder="Confirm Password"> <br><br>
 <input type="text" name="name" placeholder="Name"> <br>
-<!-- Birthday: <input type="text" name="name"> <br> -->
-Birthday:
+<input type="text" name="email" placeholder="Email"> <br>
+<input type="text" name="address" placeholder = "Adress"> <br>
+<input type="text" name="city" placeholder = "City"> 
+
+<select name="country">
+<option selected="selected">Country</option>
+<%
+	int i;
+	for( i = 0; i < countries.size(); ++i ){
+		out.println( "<option value='"+countries.get(i)+"'>"+countries.get(i)+"</option>" );
+	}
+			out.println("<br>");
+%> 
+
+</select>
+
+<br>
+<br>
+Birthday: 
 <select name="year" id="year" size="1">
 <%
    int y;
-   out.println("<option value=\" \" selected=\"selected\"> Year</option>");
+   out.println("<option selected='selected'> Year</option>");
    for(y=1950;y<=2012;y++)
-	       out.println("<option value=\""+y+"\">"+y+"</option>");
+	       out.println("<option value='"+y+"'>"+y+"</option>");
 %>
 </select>
 <select name="month" id="month" size="1">
@@ -42,38 +59,30 @@ Birthday:
 <select name="day" id="day" size="1">
 <%
    int d;
-   out.println("<option value=\" \" selected=\"selected\"> Day</option>");
+   out.println("<option selected='selected'> Day</option>");
    for(d=1;d<=31;d++)
-	       out.println("<option value=\""+d+"\">"+d+"</option>");
+	       out.println("<option value='"+d+"'>"+d+"</option>");
 %>
+
 </select>
-<br>
-<input type="text" name="email" placeholder="Email"> <br>
-<input type="text" name="address" placeholder = "Adress"> <br>
-
-
-Gender:
+<br><br>
+Gender: 
 M <input type="radio" name="gender" value="male">
-F <input type="radio" name="gender" value="female">   <br>
+   F <input type="radio" name="gender" value="female">   <br>
+<br>
 Public: <input type="checkbox" name="public">
 
-<select name="country">
-<option selected="selected">Country</option>
-<%
-	int i;
-	for( i = 0; i < countries.size(); ++i ){
-		out.println( "<option value='"+countries.get(i)+"'>"+countries.get(i)+"</option>" );
-	}
-%>
-</select>
-
-
 <br>
 <br>
 <br>
-<input type="submit" name="register" value="Register">
+<input type="submit" name="register" value="Register" onclick="checkfields()">
 
 <script type="text/javascript">
+function checkfields(){
+
+}
+
+
 function daysInMonth(month,year) {
 	var dd = new Date(year, month, 0);
 	return dd.getDate();
