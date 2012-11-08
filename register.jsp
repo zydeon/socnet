@@ -35,13 +35,13 @@ Birthday:
 <select name="year" id="year" size="1">
 <%
    int y;
-   out.println("<option selected='selected'> Year</option>");
+   out.println("<option value='none' selected='selected'> Year</option>");
    for(y=1950;y<=2012;y++)
 	       out.println("<option value='"+y+"'>"+y+"</option>");
 %>
 </select>
 <select name="month" id="month" size="1">
-<option value=" " selected="selected"> Month</option>
+<option value="none" selected="selected"> Month</option>
 <option value="1">January</option>
 <option value="2">February</option>
 <option value="3">March</option>
@@ -59,7 +59,7 @@ Birthday:
 <select name="day" id="day" size="1">
 <%
    int d;
-   out.println("<option selected='selected'> Day</option>");
+   out.println("<option value='none' selected='selected'> Day</option>");
    for(d=1;d<=31;d++)
 	       out.println("<option value='"+d+"'>"+d+"</option>");
 %>
