@@ -72,15 +72,6 @@ M <input type="radio" name="gender" value="male">
 <br>
 Public: <input type="checkbox" name="public">
 
-<select name="country">
-<option selected="selected" value="none">Country</option>
-<%
-	int i;
-	for( i = 0; i < countries.size(); ++i ){
-		out.println( "<option value='"+countries.get(i)+"'>"+countries.get(i)+"</option>" );
-	}
-%>
-</select>
 
 <br>
 <br>
@@ -89,7 +80,11 @@ Public: <input type="checkbox" name="public">
 
 <script type="text/javascript">
 function checkfields(){
-
+if (password.value != cpassword.value) { 
+alert("Your password and confirmation password do not match.");
+cpassword.focus();
+return false; 
+}
 }
 
 
