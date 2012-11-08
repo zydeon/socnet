@@ -98,7 +98,15 @@ function checkfields(){
 	document.getElementById('password').focus();
 	return false; 
     }
+
+    if((document.getElementById('city').value != ''  && document.getElementById('city').value != null) && 
+       (document.getElementById('country').value=='' || document.getElementById('country').value == null)){
+	alert("You may not choose a city without choosing a country");
+	document.getElementById('country').focus();
+    }
+    
 }
+
 function daysInMonth(month,year) {
     var dd = new Date(year, month, 0);
     return dd.getDate();
