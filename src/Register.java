@@ -14,15 +14,12 @@ public class Register extends HttpServlet {
 		String user      = request.getParameter("user");
 		String pass      = request.getParameter("password");
 		String name = request.getParameter("name");
+		String country = request.getParameter("country");
+		String city = request.getParameter("country").toUpperCase();
 
 
-		System.out.println( request.getParameter("country") );
-		System.out.println( request.getParameter("gender") );
-		System.out.println( request.getParameter("public") );
-
-
-		int id_city = 0;
-		int id_country = 0;
+		int id_city = 1;
+		int id_country = 1;
 		String birthdate = "2012-11-4"; //new Date();
 		String email = request.getParameter("email");
 		String address = request.getParameter("address");
@@ -39,6 +36,26 @@ public class Register extends HttpServlet {
 				if( rs.next() )
 					out.println("Username already exists (redirect to register.html)!");
 				else{
+
+
+
+					sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
+					rs = st.executeQuery(sql);
+					// if alreay exists
+					if( rs.next() ){
+						id_city = rs.getInt("id_city");
+						id_country = rs.getInt("id_country");
+					}
+					else{
+						// get id_country
+						sql = "SELECT id_country FROM \"country\" WHERE name = '"+country+"';";
+						rs = st.executeQuery(sql);
+						if( rs.next() )
+							id_country = rs.getInt("id_country");
+			
+						sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
+						st.executeUpdate(sql);
+					}
 
 					// generate salt
 					String salt = Database.generateSalt();						

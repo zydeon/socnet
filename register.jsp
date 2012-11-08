@@ -58,7 +58,7 @@ F <input type="radio" name="gender" value="female">   <br>
 Public: <input type="checkbox" name="public">
 
 <select name="country">
-<option selected="selected">Country</option>
+<option selected="selected" value="none">Country</option>
 <%
 	int i;
 	for( i = 0; i < countries.size(); ++i ){
