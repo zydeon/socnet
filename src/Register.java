@@ -14,22 +14,21 @@ public class Register extends HttpServlet {
 		String user      = request.getParameter("user");
 		String pass      = request.getParameter("password");
 		String name = request.getParameter("name");
+
+
+		System.out.println( request.getParameter("country") );
+		System.out.println( request.getParameter("gender") );
+		System.out.println( request.getParameter("public") );
+
+
 		int id_city = 0;
 		int id_country = 0;
 		String birthdate = "2012-11-4"; //new Date();
 		String email = request.getParameter("email");
 		String address = request.getParameter("address");
 		boolean gender_male;
-		if( request.getParameter("gender_male")!=null )
-			gender_male = true;
-		else	
-			gender_male = false;
-
-		boolean public_;
-		if( request.getParameter("public") != null )
-			public_ = true;
-		else
-			public_ = false;
+		gender_male = request.getParameter("gender_male").equals("male");
+		boolean public_ = request.getParameter("public") != null;
 
 		Connection con = Database.getConnection();
 		if(con != null){
