@@ -8,10 +8,10 @@ ArrayList<String> countries = Database.getCountries();
 
 <h1>soc.net</h1>
 
-<form action="register" method="post" >
-<input type="text" name="user" placeholder="Username"> <br>
-<input type="password" name="password" placeholder="Password"> <br>
-<input type="password" name="cpassword" placeholder="Confirm Password"> <br><br>
+<form action="register" method="post"  onsubmit="return checkfields();">
+<input type="text" name="user" id="user" placeholder="Username"> <br>
+<input type="password" name="password" id="password" placeholder="Password"> <br>
+<input type="password" name="cpassword" id="cpassword" placeholder="Confirm Password"> <br><br>
 <input type="text" name="name" placeholder="Name"> <br>
 <input type="text" name="email" placeholder="Email"> <br>
 <input type="text" name="address" placeholder = "Adress"> <br>
@@ -76,31 +76,42 @@ Public: <input type="checkbox" name="public">
 <br>
 <br>
 <br>
-<input type="submit" name="register" value="Register" onclick="checkfields()">
+<input type="submit" name="register" value="Register">
 
 <script type="text/javascript">
-function checkfields(){
-if (password.value != cpassword.value) { 
-alert("Your password and confirmation password do not match.");
-cpassword.focus();
-return false; 
+    
+function checkfields(){ 
+    if(document.getElementById('user').value=='' || document.getElementById('user').value==null){
+	alert("Invalid Username");
+	document.getElementById('user').focus();
+	return false; 
+    }
+    
+    if(document.getElementById('password').value=='' || document.getElementById('password').value==null){
+	alert("Invalid Password");
+	document.getElementById('password').focus();
+	return false; 
+    }
+    
+    if(document.getElementById('password').value != document.getElementById('cpassword').value) { 
+	alert("Your password and confirmation password do not match.");
+	document.getElementById('password').focus();
+	return false; 
+    }
 }
-}
-
-
 function daysInMonth(month,year) {
-	var dd = new Date(year, month, 0);
-	return dd.getDate();
+    var dd = new Date(year, month, 0);
+    return dd.getDate();
 }
 
 function setDayDrop(dyear, dmonth, dday) {
-	var year = dyear.options[dyear.selectedIndex].value;
-	var month = dmonth.options[dmonth.selectedIndex].value;
-	var day = dday.options[dday.selectedIndex].value;
-	var days = (year == ' ' || month == ' ') ? 31 : daysInMonth(month,year);
-	dday.options.length = 0;
-	dday.options[dday.options.length] = new Option('Day',' ');
-	for (var i = 1; i <= days; i++)
+    var year = dyear.options[dyear.selectedIndex].value;
+    var month = dmonth.options[dmonth.selectedIndex].value;
+    var day = dday.options[dday.selectedIndex].value;
+    var days = (year == ' ' || month == ' ') ? 31 : daysInMonth(month,year);
+    dday.options.length = 0;
+    dday.options[dday.options.length] = new Option('Day',' ');
+    for (var i = 1; i <= days; i++)
 	dday.options[dday.options.length] = new Option(i,i);
 }
 
