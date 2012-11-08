@@ -15,10 +15,10 @@ ArrayList<String> countries = Database.getCountries();
 <input type="text" name="name" placeholder="Name"> <br>
 <input type="text" name="email" placeholder="Email"> <br>
 <input type="text" name="address" placeholder = "Adress"> <br>
-<input type="text" name="city" placeholder = "City"> 
+<input type="text" name="city" placeholder = "City" id="city"> 
 
-<select name="country">
-<option selected="selected">Country</option>
+<select name="country" id="country">
+<option selected="selected" value="">Country</option>
 <%
 	int i;
 	for( i = 0; i < countries.size(); ++i ){
@@ -103,6 +103,7 @@ function checkfields(){
        (document.getElementById('country').value=='' || document.getElementById('country').value == null)){
 	alert("You may not choose a city without choosing a country");
 	document.getElementById('country').focus();
+	return false;
     }
     
 }
