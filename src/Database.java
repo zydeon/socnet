@@ -7,7 +7,7 @@ import java.security.SecureRandom;
 
 public class Database{
 
-	private static final int MAX_CONNECTIONS=10;
+	private static final int MAX_CONNECTIONS=50;
 	private static final String dbUrl = "jdbc:postgresql://localhost/socnet";
 	private static final String dbUser = "socnet_user";
 	private static final String dbPassword = "dbdb";
