@@ -131,17 +131,17 @@ public class Database{
 		return chatrooms.toArray( new String[0] );
 	}
 
-	public static Post[] getPosts(){
-		ArrayList<String> posts = new ArrayList<String>();
+	public static ResultSet getPosts(String id_chatroom){
+		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
 				Statement st = con.createStatement();
-				String query = "SELECT theme FROM chat_room;";
-				ResultSet rs = st.executeQuery(query);
-				while( rs.next() )
-					posts.add( rs.getString("theme") );
-				
+				String query = "SELECT m.*, p.id_parent "
+							 + "FROM message m, post p "
+							 + "WHERE m.id_message = p.id_message AND p.id_chatroom = " +id_chatroom + ";";
+
+				rs = st.executeQuery(query);
 				putConnection(con);
 			}
 		}
@@ -149,6 +149,6 @@ public class Database{
 			System.out.println(e);
 		}		
 
-		return posts.toArray( new String[0] );		
+		return rs;
 	}
 }

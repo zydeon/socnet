@@ -15,7 +15,7 @@
 </div>
 
 <div style="float:left;">
-	<iframe id="chatroom_frame" src="chat.jsp?id=1">
+	<iframe width=1000 height=1000 id="chatroom_frame" src="chat.jsp?id=1">
 
 	</iframe>
 </div>
