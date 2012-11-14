@@ -1,3 +1,4 @@
+
 package dbconnect;		// needs package to be imported to JSP
 
 import java.sql.*;
@@ -7,7 +8,7 @@ import java.security.SecureRandom;
 
 public class Database{
 
-	private static final int MAX_CONNECTIONS=50;
+	private static final int MAX_CONNECTIONS=15;
 	private static final String dbUrl = "jdbc:postgresql://localhost/socnet";
 	private static final String dbUser = "socnet_user";
 	private static final String dbPassword = "dbdb";
@@ -22,6 +23,11 @@ public class Database{
 			initialized = true;
 			System.out.println("Database initialized!! ");
 		}
+	}
+
+	public static void destroy(){
+		if(initialized)
+			connectionsPool.destroy();
 	}
 
 	public static Connection createConnection(){
@@ -83,18 +89,17 @@ public class Database{
 		return res;
 	}
 
-	public static ArrayList<String> getCountries(){
+	public static String[] getCountries(){
 		ArrayList<String> countries = new ArrayList<String>();
 		try{
 			Connection con = getConnection();
 			if(con!=null){
 				Statement st = con.createStatement();
 				String query = "SELECT name FROM country;";
-				String country;
 				ResultSet rs = st.executeQuery(query);
-				while( rs.next() ){
+				while( rs.next() )
 					countries.add( rs.getString("name") );
-				}	
+					
 				putConnection(con);
 			}
 		}
@@ -102,7 +107,48 @@ public class Database{
 			System.out.println(e);
 		}
 
+		return countries.toArray( new String[0] );
+	}
 
-		return countries;
+	public static String[] getChatrooms(){
+		ArrayList<String> chatrooms = new ArrayList<String>();
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT theme FROM chat_room;";
+				ResultSet rs = st.executeQuery(query);
+				while( rs.next() )
+					chatrooms.add( rs.getString("theme") );
+				
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+
+		return chatrooms.toArray( new String[0] );
+	}
+
+	public static Post[] getPosts(){
+		ArrayList<String> posts = new ArrayList<String>();
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT theme FROM chat_room;";
+				ResultSet rs = st.executeQuery(query);
+				while( rs.next() )
+					posts.add( rs.getString("theme") );
+				
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+
+		return posts.toArray( new String[0] );		
 	}
 }

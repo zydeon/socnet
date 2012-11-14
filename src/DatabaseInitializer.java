@@ -1,3 +1,4 @@
+
 // import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -9,6 +10,10 @@ public class DatabaseInitializer extends HttpServlet {
 
 	public void init() throws ServletException{
 		Database.init();
+	}
+
+	public void destroy(){
+		Database.destroy();
 	}
 
 }

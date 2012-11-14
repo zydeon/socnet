@@ -1,10 +1,8 @@
 <%@ page import="dbconnect.Database"%>
 <%@ page import="java.util.ArrayList" %>
 <%
-	ArrayList<String> countries = Database.getCountries();
+	String countries[] = Database.getCountries();
 	String months[] = new String[] { "January","February","March","April","May","June","July","August","September","October","November","December" } ;
-
-	// int USER_EXISTS = 1;
 %>
 
 
@@ -28,11 +26,11 @@
 	<input type="text" name="address" placeholder = "Adress"> <br>
 
 	<select name="country" onchange="hiddenCity()">
-		<option selected="selected" value="none">Country</option>
+		<option selected value="none">Country</option>
 		<%
 			int i;
-			for( i = 0; i < countries.size(); ++i )
-				out.println( "<option value='"+countries.get(i)+"'>"+countries.get(i)+"</option>" );
+			for( i = 0; i < countries.length; ++i )
+				out.println( "<option value='"+countries[i]+"'>"+countries[i]+"</option>" );
 		%> 
 	</select>
 

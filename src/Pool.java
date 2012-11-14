@@ -4,6 +4,7 @@ package dbconnect;
 import java.sql.Connection;
 import java.util.concurrent.Semaphore;
 import java.util.ArrayList;
+import java.util.Iterator;
 import dbconnect.Database;
 
 public class Pool {
@@ -33,6 +34,16 @@ public class Pool {
 	public synchronized void putItem(Connection c) {
 		items.add(c);
 		available.release();
+	}
+
+	public void destroy(){
+		try{
+			for( Iterator<Connection> i=items.iterator(); i.hasNext(); )
+				i.next().close();
+		}
+		catch(java.sql.SQLException e){
+			System.out.println(e);
+		}
 	}
 
 }

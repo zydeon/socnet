@@ -13,6 +13,9 @@ public class Login extends HttpServlet {
 		String user      = request.getParameter("user");
 		String pass      = request.getParameter("password");
 
+		// ADICIONAR ISTO
+		// escape(user);
+		// escape(pass);
 
 		try{
 			Connection con = Database.getConnection();
@@ -27,11 +30,11 @@ public class Login extends HttpServlet {
 					String salt = rs.getString("salt");
 					String hash = Database.generateHash(pass, salt);
 
-					sql = "SELECT login FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
+					sql = "SELECT count(*) FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
 					rs = st.executeQuery(sql);
 					if( rs.next() ){
-						out.println("Login successful !");
-						out.flush();
+						request.getSession(true).setAttribute("user", user);
+						response.sendRedirect("index.jsp");
 					}
 					else
 						response.sendRedirect("login.jsp?msg=Wrong username or password");
