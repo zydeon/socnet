@@ -1,4 +1,4 @@
- <%@ page import="dbconnect.Database"%>
+<%@ page import="dbconnect.Database"%>
 <%@ page import="java.util.ArrayList" %>
 <%
 	String countries[] = Database.getCountries();
