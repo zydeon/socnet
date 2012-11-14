@@ -25,7 +25,7 @@
 	<input type="text" name="email" placeholder="Email"> <br>
 	<input type="text" name="address" placeholder = "Adress"> <br>
 
-	<select name="country" onchange="hiddenCity()">
+	<select name="country" id="country" onchange="toggleCity()">
 		<option selected value="none">Country</option>
 		<%
 			int i;
@@ -99,14 +99,7 @@
 		alert("Your Passwords do not match.");
 		document.getElementById('password').focus();
 		return false; 
-		}
-
-		if((document.getElementById('city').value != ''  && document.getElementById('city').value != null) && 
-			(document.getElementById('country').value=='' || document.getElementById('country').value == null)){
-		alert("You may not choose a city without choosing a country");
-		document.getElementById('country').focus();
-		return false;
-		}
+		}obj.option[obj.selectedIndex]
 		
 	}
 
@@ -133,9 +126,19 @@
 		setDayDrop(year,month,day);
 	}
 
-	function hiddenCity(){
-		document.getElementById('city').style.display='inline';
-		document.getElementById('city').style.visibility='visible';
+	function toggleCity(){
+		var list_country = document.getElementById('country');
+
+		console.log(list_country);
+
+		if( list_country.options[list_country.selectedIndex].value == 'none' ){
+			document.getElementById('city').style.display='inline';
+			document.getElementById('city').style.visibility='hidden';
+		}
+		else{
+			document.getElementById('city').style.display='inline';
+			document.getElementById('city').style.visibility='visible';			
+		}
 	}
 
 	document.getElementById('year').onchange = setDay;
