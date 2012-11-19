@@ -137,9 +137,8 @@ public class Database{
 			Connection con = getConnection();
 			if(con!=null){
 				Statement st = con.createStatement();
-				String query = "SELECT m.*, p.id_parent "
-							 + "FROM message m, post p "
-							 + "WHERE m.id_message = p.id_message AND p.id_chatroom = " +id_chatroom + ";";
+				String query = "SELECT *"
+							 + "FROM get_posts("+id_chatroom+", NULL);";
 
 				rs = st.executeQuery(query);
 				putConnection(con);
