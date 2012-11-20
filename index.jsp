@@ -1,5 +1,5 @@
 <%@ page import="dbconnect.Database"%>
-<%! String chatrooms[] = Database.getChatrooms(); %> 
+<%! java.sql.ResultSet chatrooms = Database.getChatrooms(); %> 
 
 <jsp:include page="auth.jsp"></jsp:include>
 
@@ -7,15 +7,14 @@
 
 <div style="background-color:#000000;float:left;">
 	<select id="chatroom_list" size=30 onchange="displayChatroom()">
-		<% int i;
-		   for( i = 0; i < chatrooms.length; ++i ){ %>
-			<option value="no <%=i%>" > <%=chatrooms[i]%> </option>
+		<% while(chatrooms.next()){ %>
+			<option value="<%= chatrooms.getInt("id_chatroom") %>" >    <%= chatrooms.getString("theme") %>   </option>
 		<%}%>
 	</select>
 </div>
 
 <div style="float:left;">
-	<iframe width=1000 height=1000 id="chatroom_frame" src="chat.jsp?id=1">
+	<iframe width=1000 height=1000 id="chatroom_frame" src="chat.jsp?id=1" />
 
 	</iframe>
 </div>

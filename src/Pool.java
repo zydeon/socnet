@@ -46,4 +46,8 @@ public class Pool {
 		}
 	}
 
+	public int getSize(){
+		return items.size();
+	}
+
 }
