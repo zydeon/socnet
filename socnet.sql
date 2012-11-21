@@ -82,22 +82,6 @@ END;
 $_$;
 
 
---
--- Name: getlevel(numeric); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION getlevel(numeric) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
-        DECLARE
-                rec RECORD;
-        BEGIN
-                rec = (SELECT rlevel FROM post WHERE id_message = $1);
-                RETURN rec.rlevel+1;
-        END;
-$_$;
-
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -129,7 +113,7 @@ CREATE SEQUENCE chat_room_id_seq
 -- Name: chat_room_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('chat_room_id_seq', 9, true);
+SELECT pg_catalog.setval('chat_room_id_seq', 10, true);
 
 
 --
@@ -220,7 +204,7 @@ CREATE SEQUENCE message_id_seq
 -- Name: message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('message_id_seq', 5, true);
+SELECT pg_catalog.setval('message_id_seq', 8, true);
 
 
 --
@@ -233,7 +217,7 @@ CREATE TABLE message (
     id_attach numeric(10,0),
     text character varying(250000),
     read_date date,
-    sent_date date DEFAULT ('now'::text)::date NOT NULL,
+    sent_date timestamp without time zone DEFAULT date_trunc('second'::text, now()) NOT NULL,
     image character(254),
     msg_type character(1) NOT NULL
 );
@@ -323,6 +307,7 @@ COPY chat_room (id_chatroom, creator, theme, closed, num_rates) FROM stdin;
 7	asd	jhadjahsvdhjsa	f	0
 8	asd	HEYY	f	0
 9	asd	ASdbaskd	f	0
+10	asd	akjsdhbahskdb	f	0
 \.
 
 
@@ -357,12 +342,12 @@ COPY country (id_country, name) FROM stdin;
 --
 
 COPY message (id_message, "from", id_attach, text, read_date, sent_date, image, msg_type) FROM stdin;
-10	asd	\N	HELLOOOO	2001-01-01	2001-01-01	\N	A
-1	OI	\N	HEY YO	2012-11-15	2012-11-15	\N	A
-2	OLE	\N	ASDSAD	2012-12-15	2012-12-15	\N	A
-3	Pedro	\N	MBASBDHJASDBVSJABD	2012-12-20	2012-12-20	\N	A
-4	OLE	\N	REPLY DO ALEX	2012-12-21	2012-12-21	\N	A
-5	Pedro	\N	\N	\N	2012-11-21	\N	A
+10	asd	\N	HELLOOOO	2001-01-01	2001-01-01 00:00:00	\N	A
+1	OI	\N	HEY YO	2012-11-15	2012-11-15 00:00:00	\N	A
+2	OLE	\N	ASDSAD	2012-12-15	2012-12-15 00:00:00	\N	A
+3	Pedro	\N	MBASBDHJASDBVSJABD	2012-12-20	2012-12-20 00:00:00	\N	A
+4	OLE	\N	REPLY DO ALEX	2012-12-21	2012-12-21 00:00:00	\N	A
+5	Pedro	\N	\N	\N	2012-11-21 00:00:00	\N	A
 \.
 
 
@@ -791,6 +776,7 @@ ALTER TABLE ONLY "user"
 
 ALTER TABLE ONLY "user"
     ADD CONSTRAINT fk_user_belongs__city FOREIGN KEY (id_city) REFERENCES city(id_city) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
 
 
 CREATE USER socnet_user WITH PASSWORD 'dbdb';
