@@ -12,6 +12,10 @@
 	<button formaction="" formmethod="get">To PM's</button>
 </form>
 <button onclick="showInputTheme()">Create chatroom</button>
+<form action="">
+	<input type="text" id="new_chatroom_theme" placeholder="Theme">
+	<input type="submit" >
+</form>
 
 <div style="background-color:#000000;float:left;">
   <select id="chatroom_list" size=30 onchange="displayChatroom()">
