@@ -4,8 +4,8 @@
 
 <%
 
-   String id_chatroom = request.getParameter("id");
-   java.sql.ResultSet posts = Database.getPosts( request.getParameter("id") ); 
+	String id_chatroom = request.getParameter("id");
+	java.sql.ResultSet posts = Database.getPosts( request.getParameter("id") ); 
 
 %>
 

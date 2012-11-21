@@ -33,7 +33,7 @@
 
 <script type="text/javascript">
 	function displayChatroom(){
-		var chatroom_list = document.getElementById('chatroom_list');
+		var chatroom_list = document.getElementById('chatroom_list'); 
 		var cr = chatroom_list.options[chatroom_list.selectedIndex].value;
 		document.getElementById('chatroom_frame').src = 'chat.jsp?id='+cr;
 	}
