@@ -1,1 +1,1 @@
--
+- Alterar no modelo relactional tipo de dados de read_date e sent_date para 'timestamp without time zone'
