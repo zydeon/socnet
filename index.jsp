@@ -14,17 +14,17 @@
 <button onclick="showInputTheme()">Create chatroom</button>
 
 <div style="background-color:#000000;float:left;">
-	<select id="chatroom_list" size=30 onchange="displayChatroom()">
-		<% while(chatrooms.next()){ %>
-			<option value="<%= chatrooms.getInt("id_chatroom") %>" >    <%= chatrooms.getString("theme") %>   </option>
-		<%}%>
-	</select>
+  <select id="chatroom_list" size=30 onchange="displayChatroom()">
+    <% while(chatrooms.next()){ %>
+    <option value="<%= chatrooms.getInt("id_chatroom") %>" >    <%= chatrooms.getString("theme") %>   </option>
+    <%}%>
+  </select>
 </div>
 
 <div style="float:left;">
-	<iframe width=1000 height=1000 id="chatroom_frame" src="chat.jsp?id=1" />
-
-	</iframe>
+  <iframe width=1000 height=1000 id="chatroom_frame" src="chat.jsp?id=1" />
+  
+</iframe>
 </div>
 
 <script type="text/javascript">
