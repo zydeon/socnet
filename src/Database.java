@@ -192,4 +192,27 @@ public class Database{
 		}				
 		return true;
 	}
+    public static boolean addPM(String to,String text,String from){
+	//PM:       id_message | to | read 
+	//Message:  id_message | from | id_attach | text | read_date | sent_date | image | msg_type
+	try{
+	    Connection con = getConnection();
+	    if(con!=null){
+		Statement st = con.createStatement();
+		String query = 
+		    "BEGIN;"+
+		    "INSERT INTO message (to,type) VALUES ('"+to+"','B');"+
+		    "INSERT INTO pm (text,from) VALUES ('"+text+"','"+from+"');"+
+		    "COMMIT;";
+		
+		st.executeUpdate(query);
+		putConnection(con);
+	    }
+	}
+	catch( java.sql.SQLException e){
+	    System.out.println(e);
+	    return false;
+	}				
+	return true;
+    }
 }
