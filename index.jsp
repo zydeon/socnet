@@ -1,9 +1,17 @@
 <%@ page import="dbconnect.Database"%>
-<%! java.sql.ResultSet chatrooms = Database.getChatrooms(); %> 
 
 <jsp:include page="auth.jsp"></jsp:include>
 
+<% java.sql.ResultSet chatrooms = Database.getChatrooms(); %> 
 <h1>soc.net</h1>
+
+<form action="logout" method="get"> <button>Logout</button>  </form>
+<hr>
+<form>
+	<button formaction="" formmethod="get">To Profile</button>
+	<button formaction="" formmethod="get">To PM's</button>
+</form>
+<button onclick="showInputTheme()">Create chatroom</button>
 
 <div style="background-color:#000000;float:left;">
 	<select id="chatroom_list" size=30 onchange="displayChatroom()">
@@ -24,5 +32,9 @@
 		var chatroom_list = document.getElementById('chatroom_list');
 		var cr = chatroom_list.options[chatroom_list.selectedIndex].value;
 		document.getElementById('chatroom_frame').src = 'chat.jsp?id='+cr;
+	}
+	function showInputTheme(){
+		document.getElementById('city').style.display='inline';
+		document.getElementById('city').style.visibility='visible';			
 	}
 </script>
