@@ -32,7 +32,7 @@ public class Login extends HttpServlet {
 
 					sql = "SELECT count(*) FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
 					rs = st.executeQuery(sql);
-					if( rs.next() ){
+					if( rs.next() && rs.getInt("count")>0 ){
 						request.getSession(true).setAttribute("user", user);
 						response.sendRedirect("index.jsp");
 					}

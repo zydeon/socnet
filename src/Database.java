@@ -148,4 +148,48 @@ public class Database{
 
 		return rs;
 	}
+
+	public static String getChatRoomTheme(String id){
+		String theme = "";
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT theme "
+							 + "FROM chat_room "
+							 + "WHERE id_chatroom="+id+";";
+
+				ResultSet rs = st.executeQuery(query);
+				if(rs.next())
+					theme = rs.getString("theme");
+
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+
+		return theme;		
+	}
+
+	public static boolean addChatRoom(String theme, String creator){
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "INSERT INTO chat_room"
+							 + "(creator, theme)"
+							 + "VALUES ('"+creator+"', '"+theme+"');";
+
+				st.executeUpdate(query);
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+			return false;
+		}				
+		return true;
+	}
 }
