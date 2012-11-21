@@ -3,10 +3,16 @@
 -> <%= request.getParameter("id") %>
 
 <%
+<<<<<<< HEAD
    String id_chatroom = request.getParameter("id");
    java.sql.ResultSet posts = Database.getPosts( request.getParameter("id") ); 
 
    %>
+=======
+	String id_chatroom = request.getParameter("id");
+	java.sql.ResultSet posts = Database.getPosts( request.getParameter("id") ); 
+%>
+>>>>>>> 4b26c3bfddef466394a6315125fef1e6857dd38d
 
 <br>
 CONTENT FOR CHATROOM <br>
@@ -53,12 +59,14 @@ CONTENT FOR CHATROOM <br>
 				</div >
 				<div style="">
 					FROM <%= posts.getString("from") %> <br>
-					READ_DATE <%= posts.getString("read_date") %> <br>
-					<p>
-						TEXTO TEXTO TEXTO TEXTO TEXTO TEXTO
-					</p>
+					<%= posts.getString("read_date") %> <br>
+					<p> <%= posts.getString("text") %>	</p>
 					<a href="">Anexo</a>
 					<button>Reply</button>
+					<% if(posts.getString("from").equals(session.getAttribute("user")) ) { %>
+						<button> Edit </button>
+						<button> Delete </button>
+					<% } %>
 				</div>		
 			</div>	
 			<br>

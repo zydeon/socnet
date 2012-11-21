@@ -21,7 +21,8 @@ public class Database{
 		if(!initialized){
 			connectionsPool = new Pool(MAX_CONNECTIONS);
 			initialized = true;
-			System.out.println("Database initialized!! ");
+			System.out.println("Database initialized!!! ");
+			System.out.println("Pool size = "+connectionsPool.getSize());
 		}
 	}
 
@@ -110,17 +111,14 @@ public class Database{
 		return countries.toArray( new String[0] );
 	}
 
-	public static String[] getChatrooms(){
-		ArrayList<String> chatrooms = new ArrayList<String>();
+	public static ResultSet getChatrooms(){
+		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
 				Statement st = con.createStatement();
-				String query = "SELECT theme FROM chat_room;";
-				ResultSet rs = st.executeQuery(query);
-				while( rs.next() )
-					chatrooms.add( rs.getString("theme") );
-				
+				String query = "SELECT theme, id_chatroom FROM chat_room;";
+				rs = st.executeQuery(query);				
 				putConnection(con);
 			}
 		}
@@ -128,7 +126,7 @@ public class Database{
 			System.out.println(e);
 		}		
 
-		return chatrooms.toArray( new String[0] );
+		return rs;
 	}
 
 	public static ResultSet getPosts(String id_chatroom){

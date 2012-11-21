@@ -37,5 +37,16 @@
         <servlet-class>DatabaseInitializer</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
+    <!-- PM -->
+    <servlet>
+      <servlet-name>PM</servlet-name>
+      <servlet-class>PM</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PM</servlet-name>
+        <url-pattern>/pm</url-pattern>
+    </servlet-mapping>   
 
 </web-app>
