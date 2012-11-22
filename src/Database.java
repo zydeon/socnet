@@ -96,16 +96,18 @@ public class Database{
 				Statement st = con.createStatement();
 				ResultSet rs;
 
-				String sql = "SELECT salt FROM \"user\" WHERE login='"+user+"';";
+				String sql = "SELECT salt,disabled FROM \"user\" WHERE login='"+user+"';";
 				rs = st.executeQuery(sql);
 				if(rs.next()){
+					if (rs.getBoolean("disabled"))
+						return false;
 					String salt = rs.getString("salt");
 					String hash = generateHash(pass, salt);
 
 					sql = "SELECT count(*) FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
 					rs = st.executeQuery(sql);
-					if( rs.next() && rs.getInt("count")>0 )
-					return true;
+					if( rs.next() && rs.getInt("count")>0)
+						return true;
 				}
 				Database.putConnection(con);
 			}
@@ -375,6 +377,41 @@ public class Database{
 		}catch( java.sql.SQLException e){
 	    	System.out.println(e);
 		}				
+	}
+
+	public static void disableProfile(String user){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET disabled=true WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+	}
+
+	public static void updatePassword(String user, String pass){
+		ResultSet rs = null;
+
+		try{
+			String salt = Database.generateSalt();						
+			String hash = Database.generateHash(pass, salt);
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET pass='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}catch(java.security.NoSuchAlgorithmException e){
+			System.out.println(e);
+	    }catch(java.io.UnsupportedEncodingException e){
+	    	System.out.println(e);
+	    }
 	}
 
 }

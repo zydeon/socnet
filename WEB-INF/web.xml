@@ -41,6 +41,17 @@
         <url-pattern>/edit</url-pattern>
     </servlet-mapping>   
 
+    <!-- Disable Account -->
+    <servlet>
+        <servlet-name>Disable</servlet-name>
+        <servlet-class>Disable</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Disable</servlet-name>
+        <url-pattern>/disable</url-pattern>
+    </servlet-mapping> 
+
     <!-- LOGOUT -->
     <servlet>
         <servlet-name>Logout</servlet-name>

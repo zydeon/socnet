@@ -69,20 +69,18 @@ public class Register extends HttpServlet {
 
 			if( !city.equals("") ){
 
-			    sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
+			    sql = "SELECT id_city FROM \"city\" WHERE name = '"+city+"';";
 			    rs = st.executeQuery(sql);
 			    // if alreay exists
 			    if( rs.next() ){
-				id_city = rs.getInt("id_city");
-				id_country = rs.getInt("id_country");
-			    }
-			    else{				
-				sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
-				st.executeUpdate(sql);
-				sql = "SELECT id_city FROM city WHERE name='"+city+"';";
-				rs = st.executeQuery(sql);
-				if(rs.next())
-				    id_city = rs.getInt("id_city");
+					id_city = rs.getInt("id_city");
+			    }else{				
+					sql = "INSERT INTO city (name) VALUES ('"+city+"')";
+					st.executeUpdate(sql);
+					sql = "SELECT id_city FROM city WHERE name='"+city+"';";
+					rs = st.executeQuery(sql);
+					if(rs.next())
+					    id_city = rs.getInt("id_city");
 			    }
 			}
 		    }
@@ -91,8 +89,8 @@ public class Register extends HttpServlet {
 		    String salt = Database.generateSalt();						
 		    String hash = Database.generateHash(pass, salt);
 
-		    sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
-		    sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
+		    sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt, disabled) ";
+		    sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"',false);";
 
 		    st.executeUpdate(sql);
 		    out.println("\nRegister successful!");

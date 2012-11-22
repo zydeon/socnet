@@ -13,6 +13,7 @@ public class Edit extends HttpServlet {
 
 	String user = (String) request.getSession().getAttribute("user");
 	String name = request.getParameter("name");
+	String pass = request.getParameter("password");
 
 	String country = request.getParameter("country"); //.toUpperCase();
 	String city = request.getParameter("city"); //.toUpperCase();
@@ -39,10 +40,12 @@ public class Edit extends HttpServlet {
 		
 	Boolean public_ = request.getParameter("public") != null;
 
+	if (!pass.equals(""))
+		Database.updatePassword(user, pass);
 	Database.updateProfile(user, public_, gender_male, birthdate, email, address, name, country);
 
+
 	response.sendRedirect("index.jsp");
-	
 
     }
 
