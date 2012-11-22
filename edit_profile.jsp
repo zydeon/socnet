@@ -60,7 +60,7 @@
 			<%
 				int m;
 				for( m = 0; m < 12; ++m )
-					out.println("<option "+(month==m?"selected":"")+" value='"+(m+1)+"''>"+months[m]+"</option>");
+					out.println("<option "+((month-1)==m?"selected":"")+" value='"+(m+1)+"''>"+months[m]+"</option>");
 			%>
 		</select>
 		<!-- DAY -->
@@ -79,7 +79,7 @@
 		M <input type="radio" name="gender" value="male" <%= (male==true ? "checked" : "") %> >
 		F <input type="radio" name="gender" value="female" <%= (male==false ? "checked" : "") %>><br><br>
 
-		Public: <input type="checkbox" name="public" checked <%= (publicP ? "checked" : "") %>>
+		Public: <input type="checkbox" name="public" <%= (publicP ? "checked" : "") %>>
 		<br><br>
 	<% } %>
 	<input type="submit" name="enter" value="Save">

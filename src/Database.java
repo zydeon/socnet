@@ -361,4 +361,20 @@ public class Database{
 	}				
 	return true;
     }
+
+
+	public static void updateProfile(String user, boolean public_, boolean gender_male, String birthdate, String email, String address, String name, String country){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET public="+public_+" , gender_male="+gender_male+" , birthdate="+birthdate+" , email='"+email+"' , address='"+address+"' , name='"+name+"' , id_country="+country+" WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+	}
+
 }
