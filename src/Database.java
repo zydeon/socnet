@@ -312,9 +312,8 @@ public class Database{
 
 				rs = st.executeQuery(query);
 			}		
-		catch( java.sql.SQLException e){
+		}catch( java.sql.SQLException e){
 	    	System.out.println(e);
-	    	return false;
 		}				
 		return rs;
 	}

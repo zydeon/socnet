@@ -30,6 +30,12 @@
         <url-pattern>/register</url-pattern>
     </servlet-mapping>   
 
+   <!-- Edit -->
+    <servlet>
+        <servlet-name>Edit</servlet-name>
+        <servlet-class>Edit</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>Edit</servlet-name>
         <url-pattern>/edit</url-pattern>
