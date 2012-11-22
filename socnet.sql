@@ -98,19 +98,6 @@ CREATE FUNCTION getlevel(numeric) RETURNS integer
 $_$;
 
 
---
--- Name: increment(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION increment() RETURNS integer
-    LANGUAGE plpgsql
-    AS $$
-        BEGIN
-                RETURN 1;
-        END;
-$$;
-
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -142,7 +129,7 @@ CREATE SEQUENCE chat_room_id_seq
 -- Name: chat_room_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('chat_room_id_seq', 5, true);
+SELECT pg_catalog.setval('chat_room_id_seq', 9, true);
 
 
 --
@@ -153,8 +140,8 @@ CREATE TABLE chat_room (
     id_chatroom numeric(10,0) DEFAULT nextval('chat_room_id_seq'::regclass) NOT NULL,
     creator character varying(24) NOT NULL,
     theme character varying(20) NOT NULL,
-    closed boolean NOT NULL,
-    num_rates numeric(3,0) NOT NULL
+    closed boolean DEFAULT false NOT NULL,
+    num_rates numeric(3,0) DEFAULT 0 NOT NULL
 );
 
 
@@ -246,7 +233,7 @@ CREATE TABLE message (
     id_attach numeric(10,0),
     text character varying(250000),
     read_date date,
-    sent_date date NOT NULL,
+    sent_date date DEFAULT ('now'::text)::date NOT NULL,
     image character(254),
     msg_type character(1) NOT NULL
 );
@@ -271,7 +258,7 @@ CREATE TABLE post (
     id_message numeric(10,0) NOT NULL,
     id_chatroom numeric(10,0) NOT NULL,
     id_parent numeric(10,0),
-    rlevel integer DEFAULT increment() NOT NULL
+    rlevel integer DEFAULT 1 NOT NULL
 );
 
 
@@ -332,6 +319,10 @@ COPY chat_room (id_chatroom, creator, theme, closed, num_rates) FROM stdin;
 2	asd	asdasd	t	0
 4	asd	Outra	f	200
 5	asd	Mais uma	f	1
+6	asd	asd	f	0
+7	asd	jhadjahsvdhjsa	f	0
+8	asd	HEYY	f	0
+9	asd	ASdbaskd	f	0
 \.
 
 
@@ -805,4 +796,4 @@ ALTER TABLE ONLY "user"
 CREATE USER socnet_user WITH PASSWORD 'dbdb';
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO socnet_user;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO socnet_user;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO socnet_user
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO socnet_user;

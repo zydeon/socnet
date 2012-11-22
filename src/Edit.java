@@ -12,7 +12,6 @@ public class Edit extends HttpServlet {
 	PrintWriter out = response.getWriter();
 
 	String user      = request.getParameter("user");
-	String pass      = request.getParameter("password");
 	String name = request.getParameter("name");
 
 	String country = request.getParameter("country"); //.toUpperCase();
@@ -74,7 +73,7 @@ public class Edit extends HttpServlet {
 				    id_city = rs.getInt("id_city");
 			    }
 			}
-		    }
+		}
 
 		    // generate salt
 		    String salt = Database.generateSalt();						

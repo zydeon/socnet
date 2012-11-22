@@ -38,6 +38,17 @@ public class Register extends HttpServlet {
 		
 	boolean public_ = request.getParameter("public") != null;
 
+
+	// if( Database.existsUser(user) ){
+	// 	if(  )
+	// }
+	// else
+	// 	response.sendRedirect("register.jsp?msg=User already exists");
+
+
+	// Database.registerUser(user, pass, name, country, city, birthdate, email, address, public_);
+
+
 	Connection con = Database.getConnection();
 	if(con != null){
 	    try{

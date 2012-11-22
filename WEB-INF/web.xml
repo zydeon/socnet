@@ -47,6 +47,18 @@
     </servlet-mapping>       
 
 
+    <!-- NEW CHATROOM -->
+    <servlet>
+        <servlet-name>NewChatRoom</servlet-name>
+        <servlet-class>NewChatRoom</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NewChatRoom</servlet-name>
+        <url-pattern>/new_chatroom</url-pattern>
+    </servlet-mapping>      
+
+
     <!-- DATABASE -->
     <servlet>
         <servlet-name>DatabaseInitializer</servlet-name>
