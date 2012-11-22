@@ -90,17 +90,14 @@ public class Database{
 		return res;
 	}
 
-	public static String[] getCountries(){
-		ArrayList<String> countries = new ArrayList<String>();
+	public static ResultSet getCountries(){
+		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
 				Statement st = con.createStatement();
-				String query = "SELECT name FROM country;";
-				ResultSet rs = st.executeQuery(query);
-				while( rs.next() )
-					countries.add( rs.getString("name") );
-					
+				String query = "SELECT * FROM country;";
+				rs = st.executeQuery(query);
 				putConnection(con);
 			}
 		}
@@ -108,7 +105,7 @@ public class Database{
 			System.out.println(e);
 		}
 
-		return countries.toArray( new String[0] );
+		return rs;
 	}
 
 	public static ResultSet getChatrooms(){
@@ -137,6 +134,45 @@ public class Database{
 				Statement st = con.createStatement();
 				String query = "SELECT *"
 							 + "FROM get_posts("+id_chatroom+", NULL);";
+
+				rs = st.executeQuery(query);
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+
+		return rs;
+	}
+
+	public static String getCity(String id_city){
+		ResultSet rs = null;
+		String city_name = "nao";
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT name FROM city WHERE id_city="+id_city+";";
+				rs = st.executeQuery(query);
+				if(rs.next())
+					city_name = rs.getString("name");
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}
+		return city_name;
+	}
+
+	public static ResultSet getUserInfo(String user){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT * FROM \"user\" WHERE login='"+user+"'";
 
 				rs = st.executeQuery(query);
 				putConnection(con);

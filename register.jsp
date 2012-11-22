@@ -1,7 +1,7 @@
 <%@ page import="dbconnect.Database"%>
-<%@ page import="java.util.ArrayList" %>
+
 <%
-	String countries[] = Database.getCountries();
+	java.sql.ResultSet countries = Database.getCountries();
 	String months[] = new String[] { "January","February","March","April","May","June","July","August","September","October","November","December" } ;
 %>
 
@@ -23,14 +23,13 @@
 	<br><br>
 	<input type="text" name="name" placeholder="Name"> <br>
 	<input type="text" name="email" placeholder="Email"> <br>
-	<input type="text" name="address" placeholder = "Adress"> <br>
+	<input type="text" name="address" placeholder = "Address"> <br>
 
 	<select name="country" id="country" onchange="toggleCity()">
 		<option selected value="none">Country</option>
 		<%
-			int i;
-			for( i = 0; i < countries.length; ++i )
-				out.println( "<option value='"+countries[i]+"'>"+countries[i]+"</option>" );
+			while(countries.next())
+				out.println( "<option value='"+countries.getString("id_country")+"'>"+countries.getString("name")+"</option>" );
 		%> 
 	</select>
 
