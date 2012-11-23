@@ -96,16 +96,18 @@ public class Database{
 				Statement st = con.createStatement();
 				ResultSet rs;
 
-				String sql = "SELECT salt FROM \"user\" WHERE login='"+user+"';";
+				String sql = "SELECT salt,disabled FROM \"user\" WHERE login='"+user+"';";
 				rs = st.executeQuery(sql);
 				if(rs.next()){
+					if (rs.getBoolean("disabled"))
+						return false;
 					String salt = rs.getString("salt");
 					String hash = generateHash(pass, salt);
 
 					sql = "SELECT count(*) FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
 					rs = st.executeQuery(sql);
-					if( rs.next() && rs.getInt("count")>0 )
-					return true;
+					if( rs.next() && rs.getInt("count")>0)
+						return true;
 				}
 				Database.putConnection(con);
 			}
@@ -201,17 +203,14 @@ public class Database{
 	// 	}
 	// }
 
-	public static String[] getCountries(){
-		ArrayList<String> countries = new ArrayList<String>();
+	public static ResultSet getCountries(){
+		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
 				Statement st = con.createStatement();
-				String query = "SELECT name FROM country;";
-				ResultSet rs = st.executeQuery(query);
-				while( rs.next() )
-				countries.add( rs.getString("name") );
-				
+				String query = "SELECT * FROM country;";
+				rs = st.executeQuery(query);
 				putConnection(con);
 			}
 		}
@@ -219,7 +218,7 @@ public class Database{
 			System.out.println(e);
 		}
 
-		return countries.toArray( new String[0] );
+		return rs;
 	}
 
 	public static ResultSet getChatrooms(){
@@ -260,6 +259,27 @@ public class Database{
 		return rs;
 	}
 
+
+	public static String getCity(String id_city){
+		ResultSet rs = null;
+		String city_name = "";
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT name FROM city WHERE id_city="+id_city+";";
+				rs = st.executeQuery(query);
+				if(rs.next())
+					city_name = rs.getString("name");
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}
+		return city_name;
+	}
+
 	public static String getChatRoomTheme(String id){
 		String theme = "";
 		try{
@@ -280,8 +300,24 @@ public class Database{
 		catch( java.sql.SQLException e){
 			System.out.println(e);
 		}
-
 		return theme;
+	}
+
+
+	public static ResultSet getUserInfo(String user){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT * FROM \"user\" WHERE login='"+user+"'";
+
+				rs = st.executeQuery(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+		return rs;
 	}
 
 	public static boolean addChatRoom(String theme, String creator){
@@ -303,6 +339,7 @@ public class Database{
 		}
 		return true;
 	}
+
     public static boolean addPM(String to,String text,String from){
 	//PM:       id_message | to | read 
 	//Message:  id_message | from | id_attach | text | read_date | sent_date | image | msg_type
@@ -326,4 +363,55 @@ public class Database{
 	}				
 	return true;
     }
+
+
+	public static void updateProfile(String user, boolean public_, boolean gender_male, String birthdate, String email, String address, String name, String country){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET public="+public_+" , gender_male="+gender_male+" , birthdate="+birthdate+" , email='"+email+"' , address='"+address+"' , name='"+name+"' , id_country="+country+" WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+	}
+
+	public static void disableProfile(String user){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET disabled=true WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+	}
+
+	public static void updatePassword(String user, String pass){
+		ResultSet rs = null;
+
+		try{
+			String salt = Database.generateSalt();						
+			String hash = Database.generateHash(pass, salt);
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET pass='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}catch(java.security.NoSuchAlgorithmException e){
+			System.out.println(e);
+	    }catch(java.io.UnsupportedEncodingException e){
+	    	System.out.println(e);
+	    }
+	}
+
 }

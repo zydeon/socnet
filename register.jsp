@@ -1,5 +1,5 @@
 <%@ page import="dbconnect.Database"%>
-<%@ page import="java.util.ArrayList" %>
+
 <%
    String countries[] = Database.getCountries();
    String months[] = new String[] { "January","February","March","April","May","June","July","August","September","October","November","December" } ;
@@ -97,7 +97,6 @@
     </div>
   </body>
   <script type="text/javascript">
-    
     <script type="text/javascript">
 
 function checkfields(){ 

@@ -8,7 +8,7 @@
 <form action="logout" method="get"> <button>Logout</button>  </form>
 <hr>
 <form>
-	<button formaction="" formmethod="get">To Profile</button>
+	<button formaction="edit_profile.jsp" formmethod="get">To Profile</button>
 	<button formaction="" formmethod="get">To PM's</button>
 </form>
 <button onclick="showInputTheme()">Create chatroom</button>
