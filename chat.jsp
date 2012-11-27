@@ -25,11 +25,13 @@
 						<%= posts.getString("read_date") %> <br>
 						<p> <%= posts.getString("text") %>	</p>
 						<a href="">Anexo</a>
-						<button>Reply</button>
+						<form>
+						<button onclick="window.open('http://www.legendas.tv','','width=510,height=550,left=250,top=50,screenX=250,screenY=50,toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,copyhistory=no,resizable=no,name=infolegenda,channelmode=yes')" >Reply</button>
 						<% if(posts.getString("from").equals(session.getAttribute("user")) ) { %>
 							<button> Edit </button>
 							<button> Delete </button>
 						<% } %>
+						</form>
 					</div>		
 				</div>	
 				<br>

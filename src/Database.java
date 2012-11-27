@@ -65,30 +65,6 @@ public class Database{
 			System.out.println("Database not initialized!");
 	}
 
-	
-	// MUDAR PARA SERVLETS (TIRAR SYNCHRONIZED) ????
-	public static synchronized String generateHash(String password, String salt) throws java.security.NoSuchAlgorithmException {
-		MessageDigest digest = MessageDigest.getInstance("SHA-256");
-		digest.reset();
-		// REVER ISTO
-		digest.update(salt.getBytes());
-		return bytesToHex( digest.digest(password.getBytes()) );
-	}
-
-	public static synchronized String generateSalt() throws java.io.UnsupportedEncodingException{
-		byte[] salt = new byte[SALT_BYTES];
-		(new SecureRandom()).nextBytes(salt);
-		return bytesToHex(salt);
-	}
-
-	private static String bytesToHex(byte[] bytes){
-		String res = "0x";
-		for (byte b : bytes) {
-			res += String.format("%02X", b);
-		}
-		return res;
-	}
-
 	public static boolean authUser(String user, String pass){
 		try{
 			Connection con = Database.getConnection();
@@ -100,12 +76,12 @@ public class Database{
 				rs = st.executeQuery(sql);
 				if(rs.next()){
 					String salt = rs.getString("salt");
-					String hash = generateHash(pass, salt);
 
-					sql = "SELECT count(*) FROM \"user\" WHERE login='"+user+"' AND pass='"+hash+"'";
+					sql = "SELECT count(*) FROM \"user\" "
+						+ "WHERE login='"+user+"' AND phash = crypt('"+pass+"','"+salt+"');";
+
 					rs = st.executeQuery(sql);
-					if( rs.next() && rs.getInt("count")>0 )
-					return true;
+					return rs.next() && rs.getInt("count")>0;
 				}
 				Database.putConnection(con);
 			}
