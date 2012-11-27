@@ -12,7 +12,6 @@ public class Database{
 	private static final String dbUser = "socnet_user";
 	private static final String dbPassword = "dbdb";
 	private static boolean initialized = false;
-	private static final int SALT_BYTES = 32;
 
 	private static Pool connectionsPool;
 
@@ -67,29 +66,32 @@ public class Database{
 
 	public static boolean authUser(String user, String pass){
 		try{
-			Connection con = Database.getConnection();
+			Connection con = getConnection();
 			if( con != null ){
 				Statement st = con.createStatement();
 				ResultSet rs;
 
-				String sql = "SELECT salt FROM \"user\" WHERE login='"+user+"';";
+				String sql = "SELECT salt,disabled FROM \"user\" WHERE login='"+user+"';";
 				rs = st.executeQuery(sql);
 				if(rs.next()){
-					String salt = rs.getString("salt");
+					if (!rs.getBoolean("disabled")){
+						String salt = rs.getString("salt");
 
-					sql = "SELECT count(*) FROM \"user\" "
-						+ "WHERE login='"+user+"' AND phash = crypt('"+pass+"','"+salt+"');";
+						sql = "SELECT count(*) FROM \"user\" "
+							+ "WHERE login='"+user+"' AND pwhash = crypt('"+pass+"','"+salt+"');";
 
-					rs = st.executeQuery(sql);
-					return rs.next() && rs.getInt("count")>0;
+						rs = st.executeQuery(sql);
+
+						if( rs.next() && rs.getInt("count")>0){										
+							putConnection(con);
+							return true;
+						}
+					}
 				}
-				Database.putConnection(con);
+				putConnection(con);
 			}
 		}
 		catch(SQLException e){
-			System.out.println(e);
-		}
-		catch(java.security.NoSuchAlgorithmException e){
 			System.out.println(e);
 		}
 		return false;
@@ -115,79 +117,54 @@ public class Database{
 		return false;
 	}
 
-	// public static boolean registerUser(String user, String pass, String name, String country, String city, String birthdate, String email, String address, boolean public_){
-	// 	Connection con = Database.getConnection();
-	// 	if(con != null){
-	// 		try{
-	// 			String sql = "SELECT login FROM \"user\" WHERE login='"+user+"'";
-	// 			Statement st = con.createStatement();
-	// 			ResultSet rs = st.executeQuery(sql);
+	public static boolean existsCountry(String id_country){
+		Connection con = Database.getConnection();
+		if(con != null){
+			try{
+				String sql = "SELECT count(*) FROM \"country\" WHERE id_country='"+id_country+"'";
+				Statement st = con.createStatement();
+				ResultSet rs = st.executeQuery(sql);
 
-	// 			if( rs.next() ){
-	// 				response.sendRedirect("register.jsp?msg=User already exists");
-	// 			}
-	// 			else {
-	// 				if( !country.equals("none") ) {
-
-	// 					sql = "SELECT id_country FROM \"country\" WHERE name='"+country+"';";
-	// 					rs = st.executeQuery(sql);
-	// 					if (rs.next())
-	// 						id_country = rs.getInt("id_country");
-
-	// 					if( !city.equals("") ){
-
-	// 						sql = "SELECT id_city, id_country FROM \"city\" WHERE name = '"+city+"';";
-	// 						rs = st.executeQuery(sql);
-	// 						// if alreay exists
-	// 						if( rs.next() ){
-	// 							id_city = rs.getInt("id_city");
-	// 							id_country = rs.getInt("id_country");
-	// 						}
-	// 						else{
-	// 							sql = "INSERT INTO city (name, id_country) VALUES ('"+city+"',"+id_country+")";
-	// 							st.executeUpdate(sql);
-	// 							sql = "SELECT id_city FROM city WHERE name='"+city+"';";
-	// 							rs = st.executeQuery(sql);
-	// 							if(rs.next())
-	// 								id_city = rs.getInt("id_city");
-	// 						}
-	// 					}
-	// 				}
-
-	// 				// generate salt
-	// 				String salt = Database.generateSalt();
-	// 				String hash = Database.generateHash(pass, salt);
-
-	// 				sql =  "INSERT INTO \"user\" (login, pass, name, id_city, id_country, birthdate, email, address, gender_male, public, salt) ";
-	// 				sql += "VALUES ('"+user+"','"+hash+"','"+name+"',"+id_city+","+id_country+","+birthdate+",'"+email+"','"+address+"',"+gender_male+","+public_+",'"+salt+"');";
-
-	// 				st.executeUpdate(sql);
-	// 				out.println("\nRegister successful!");
-	// 				out.flush();
-	// 			}
+				if( rs.next() && rs.getInt("count")>0 )
+					return true;
 				
-	// 			Database.putConnection(con);
-	// 		}
-	// 		catch(SQLException e){
-	// 			System.out.println(e);
-	// 		}
-	// 		catch(java.security.NoSuchAlgorithmException e){
-	// 			System.out.println(e);
-	// 		}
-	// 	}
-	// }
+				Database.putConnection(con);
+			}
+			catch(SQLException e){
+				System.out.println(e);
+			}
+		}
+		return false;		
+	}
 
-	public static String[] getCountries(){
-		ArrayList<String> countries = new ArrayList<String>();
+
+
+	public static int getCityID(String city_name){
+		// return id_city of 'city_name'
+		// if city_name does not exist adds it and returns the new id_city
+		int id_city = -1;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
+				// CHECK IF CITY EXISTS
+				String sql = "SELECT id_city FROM \"city\" WHERE name='"+city_name+"'";
 				Statement st = con.createStatement();
-				String query = "SELECT name FROM country;";
-				ResultSet rs = st.executeQuery(query);
-				while( rs.next() )
-				countries.add( rs.getString("name") );
+				ResultSet rs = st.executeQuery(sql);
+
+				if( rs.next() )
+					return rs.getInt("id_city");
 				
+				// IF it does not exist
+				sql = "SELECT nextval('city_id_seq') AS id_city;";
+				rs = st.executeQuery(sql);
+				
+				if(rs.next())
+					id_city = rs.getInt("id_city");
+
+				sql = "INSERT INTO city "
+				+ "VALUES ("+id_city+",'"+city_name+"');";
+				st.executeUpdate(sql);		
+
 				putConnection(con);
 			}
 		}
@@ -195,7 +172,99 @@ public class Database{
 			System.out.println(e);
 		}
 
-		return countries.toArray( new String[0] );
+		return id_city;
+	}
+
+	public static String generateSalt(){
+		String salt = null;		
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String sql = "SELECT gen_salt('md5') AS salt;";
+				ResultSet rs = st.executeQuery(sql);
+				if(rs.next())
+					salt = rs.getString("salt");
+
+				putConnection(con);
+			}
+		}
+		catch(SQLException e){
+			System.out.println(e);
+		}
+
+		return salt;
+	}
+
+	public static String generateHash(String pass, String salt){
+		String hash = null;		
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String sql = "SELECT crypt('"+pass+"','"+salt+"') AS hash;";
+				ResultSet rs = st.executeQuery(sql);
+				if(rs.next())
+					hash = rs.getString("hash");
+
+				putConnection(con);
+			}
+		}
+		catch(SQLException e){
+			System.out.println(e);
+		}
+
+		return hash;	
+	}
+
+	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name, String birthdate, String email, String address, boolean public_, boolean gender_male){
+		try{
+			Connection con = getConnection();
+			if(con != null){
+				Statement st = con.createStatement();
+				ResultSet rs;
+				String sql, salt, hash;
+		
+			
+				if(existsCountry(id_country)){
+					int id_city = getCityID(city_name);
+					// generate salt
+					salt = generateSalt();
+					hash = generateHash(pass, salt);
+
+					sql = "INSERT INTO \"user\" (login, id_city, id_country, pwhash, name, birthdate, email, gender_male, address, public, salt, disabled) "
+						+ "VALUES ('"+user+"',"+id_city+","+id_country+",'"+hash+"','"+name+"',"+birthdate+",'"+email+"',"+gender_male+",'"+address+"',"+public_+",'"+salt+"',false);";
+
+					st.executeUpdate(sql);
+					putConnection(con);
+					return true;					
+				}
+				putConnection(con);
+			}
+		}
+		catch(SQLException e){
+			System.out.println(e);
+		}
+
+		return false;
+	}
+
+	public static ResultSet getCountries(){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT * FROM country;";
+				rs = st.executeQuery(query);
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}
+
+		return rs;
 	}
 
 	public static ResultSet getChatrooms(){
@@ -256,8 +325,24 @@ public class Database{
 		catch( java.sql.SQLException e){
 			System.out.println(e);
 		}
-
 		return theme;
+	}
+
+
+	public static ResultSet getUserInfo(String user){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT * FROM \"user\" WHERE login='"+user+"'";
+
+				rs = st.executeQuery(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+		return rs;
 	}
 
 	public static boolean addChatRoom(String theme, String creator){
@@ -279,4 +364,75 @@ public class Database{
 		}
 		return true;
 	}
+
+    public static boolean addPM(String to,String text,String from){
+	//PM:       id_message | to | read 
+	//Message:  id_message | from | id_attach | text | read_date | sent_date | image | msg_type
+	try{
+	    Connection con = getConnection();
+	    if(con!=null){
+		Statement st = con.createStatement();
+		String query = 
+		    "BEGIN;"+
+		    "INSERT INTO message (to,type) VALUES ('"+to+"','B');"+
+		    "INSERT INTO pm (text,from) VALUES ('"+text+"','"+from+"');"+
+		    "COMMIT;";
+		
+		st.executeUpdate(query);
+		putConnection(con);
+	    }
+	}
+	catch( java.sql.SQLException e){
+	    System.out.println(e);
+	    return false;
+	}				
+	return true;
+    }
+
+
+	public static void updateProfile(String user, boolean public_, boolean gender_male, String birthdate, String email, String address, String name, String country){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET public="+public_+" , gender_male="+gender_male+" , birthdate="+birthdate+" , email='"+email+"' , address='"+address+"' , name='"+name+"' , id_country="+country+" WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+	}
+
+	public static void disableProfile(String user){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET disabled=true WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}				
+	}
+
+	public static void updatePassword(String user, String pass){
+		ResultSet rs = null;
+
+		try{
+			String salt = generateSalt();
+			String hash = generateHash(pass, salt);
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "UPDATE \"user\" SET pwhash='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
+				st.executeUpdate(query);
+			}		
+		}catch( java.sql.SQLException e){
+	    	System.out.println(e);
+		}
+	}
+
 }
