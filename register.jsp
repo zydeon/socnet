@@ -19,7 +19,7 @@
 
   <body>
     <br>
-    <div class="main_div">
+    <div class="intro_div">
       <h1>soc.net</h1>
       <div class="reg_div">
 	<h4>Registration</h4>
