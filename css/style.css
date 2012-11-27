@@ -1,0 +1,86 @@
+body{
+    background-image:url('../pics/fibers.png');
+    text-align:center;
+    font-family:"Arial", Times, serif; 
+    color:white;
+    vertical-align:middle;
+}
+
+h1{
+    color:white;
+    text-align:center;
+    
+}
+
+h{
+    font-size:20px;
+    text-align:left;
+    color:white;
+    
+}
+
+p{
+    color:white;
+}
+
+.title_div{
+    display:inline-block;
+    background-color:rgba(0,0,0,0.40);
+    width:100%;
+    height:auto;
+    border-radius:5px;
+}
+
+.reg_div{
+    float:left;
+    display:inline-block;
+    background-color:rgba(0,0,0,0.40);
+    padding:20px;
+    color:white;
+    border-radius:5px;
+}
+.desc_div{
+    float:left;
+    display:inline-block;
+    background-color:rgba(0,0,0,0.40);
+    color:white;
+    margin-right:30px;
+    margin-bottom:15px;
+    height:150px;
+    width:200px;
+    padding:20px;
+    border-radius:5px;
+}
+.login_div{
+    float:right;
+    display:inline-block;
+    vertical-align:center;
+    padding:20px;
+    background-color:rgba(0,0,0,0.40);
+    margin-right:auto;
+    margin-bottom:15px;
+    height:150px;
+    width:200px;
+    border-radius:5px;
+}
+
+.main_div{
+    display:inline-block;
+    background-color:rgba(0,0,0,0.40);
+    padding:80px;
+    height:auto;
+    width:80%;
+    border-radius:5px;
+}
+
+
+.intro_div{
+    display:inline-block;
+    background-color:rgba(0,0,0,0.40);
+    padding:80px;
+    height:auto;
+    border-radius:5px;
+}
+#enter{
+    align:right;
+}

@@ -39,7 +39,7 @@
 		%>
 		</select>
 
-		<input type="text" name="city" placeholder = "City" id="city" style="<%= hidden %>" value="<%= Database.getCity(userInfo.getString("id_city"))%>"> <br><br>
+		<input type="text" name="city" placeholder = "City" id="city" style="<%= hidden %>" value="<%= Database.getCityName(userInfo.getString("id_city"))%>"> <br><br>
 		<% 
 		Integer year = 0;
 		Integer month = 0;

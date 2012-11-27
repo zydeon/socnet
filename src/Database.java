@@ -1,4 +1,4 @@
-package dbconnect;		// needs package to be imported to JSP
+package dbconnect;      // needs package to be imported to JSP
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class Database{
 
 						rs = st.executeQuery(sql);
 
-						if( rs.next() && rs.getInt("count")>0){										
+						if( rs.next() && rs.getInt("count")>0){                                     
 							putConnection(con);
 							return true;
 						}
@@ -134,9 +134,29 @@ public class Database{
 				System.out.println(e);
 			}
 		}
-		return false;		
+		return false;       
 	}
 
+	public static String getCityName(String id_city){
+		ResultSet rs = null;
+		String city_name = "";
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				Statement st = con.createStatement();
+				String query = "SELECT name FROM city WHERE id_city="+id_city+";";
+				rs = st.executeQuery(query);
+				if(rs.next())
+					city_name = rs.getString("name");
+
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}
+		return city_name;
+	}
 
 
 	public static int getCityID(String city_name){
@@ -163,7 +183,7 @@ public class Database{
 
 				sql = "INSERT INTO city "
 				+ "VALUES ("+id_city+",'"+city_name+"');";
-				st.executeUpdate(sql);		
+				st.executeUpdate(sql);      
 
 				putConnection(con);
 			}
@@ -176,7 +196,7 @@ public class Database{
 	}
 
 	public static String generateSalt(){
-		String salt = null;		
+		String salt = null;     
 		try{
 			Connection con = getConnection();
 			if(con!=null){
@@ -197,7 +217,7 @@ public class Database{
 	}
 
 	public static String generateHash(String pass, String salt){
-		String hash = null;		
+		String hash = null;     
 		try{
 			Connection con = getConnection();
 			if(con!=null){
@@ -214,7 +234,7 @@ public class Database{
 			System.out.println(e);
 		}
 
-		return hash;	
+		return hash;    
 	}
 
 	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name, String birthdate, String email, String address, boolean public_, boolean gender_male){
@@ -237,7 +257,7 @@ public class Database{
 
 					st.executeUpdate(sql);
 					putConnection(con);
-					return true;					
+					return true;                    
 				}
 				putConnection(con);
 			}
@@ -338,10 +358,10 @@ public class Database{
 				String query = "SELECT * FROM \"user\" WHERE login='"+user+"'";
 
 				rs = st.executeQuery(query);
-			}		
+			}       
 		}catch( java.sql.SQLException e){
-	    	System.out.println(e);
-		}				
+			System.out.println(e);
+		}               
 		return rs;
 	}
 
@@ -365,29 +385,29 @@ public class Database{
 		return true;
 	}
 
-    public static boolean addPM(String to,String text,String from){
+	public static boolean addPM(String to,String text,String from){
 	//PM:       id_message | to | read 
 	//Message:  id_message | from | id_attach | text | read_date | sent_date | image | msg_type
 	try{
-	    Connection con = getConnection();
-	    if(con!=null){
+		Connection con = getConnection();
+		if(con!=null){
 		Statement st = con.createStatement();
 		String query = 
-		    "BEGIN;"+
-		    "INSERT INTO message (to,type) VALUES ('"+to+"','B');"+
-		    "INSERT INTO pm (text,from) VALUES ('"+text+"','"+from+"');"+
-		    "COMMIT;";
+			"BEGIN;"+
+			"INSERT INTO message (to,type) VALUES ('"+to+"','B');"+
+			"INSERT INTO pm (text,from) VALUES ('"+text+"','"+from+"');"+
+			"COMMIT;";
 		
 		st.executeUpdate(query);
 		putConnection(con);
-	    }
+		}
 	}
 	catch( java.sql.SQLException e){
-	    System.out.println(e);
-	    return false;
-	}				
+		System.out.println(e);
+		return false;
+	}               
 	return true;
-    }
+	}
 
 
 	public static void updateProfile(String user, boolean public_, boolean gender_male, String birthdate, String email, String address, String name, String country){
@@ -398,10 +418,10 @@ public class Database{
 				Statement st = con.createStatement();
 				String query = "UPDATE \"user\" SET public="+public_+" , gender_male="+gender_male+" , birthdate="+birthdate+" , email='"+email+"' , address='"+address+"' , name='"+name+"' , id_country="+country+" WHERE login='"+user+"'";
 				st.executeUpdate(query);
-			}		
+			}       
 		}catch( java.sql.SQLException e){
-	    	System.out.println(e);
-		}				
+			System.out.println(e);
+		}               
 	}
 
 	public static void disableProfile(String user){
@@ -412,10 +432,10 @@ public class Database{
 				Statement st = con.createStatement();
 				String query = "UPDATE \"user\" SET disabled=true WHERE login='"+user+"'";
 				st.executeUpdate(query);
-			}		
+			}       
 		}catch( java.sql.SQLException e){
-	    	System.out.println(e);
-		}				
+			System.out.println(e);
+		}               
 	}
 
 	public static void updatePassword(String user, String pass){
@@ -429,9 +449,9 @@ public class Database{
 				Statement st = con.createStatement();
 				String query = "UPDATE \"user\" SET pwhash='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
 				st.executeUpdate(query);
-			}		
+			}       
 		}catch( java.sql.SQLException e){
-	    	System.out.println(e);
+			System.out.println(e);
 		}
 	}
 

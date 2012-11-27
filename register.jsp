@@ -17,26 +17,26 @@ if(msg!=null)
 	<title>soc.net</title>  
 </head>
 
-<body>
-	<br>
-	<div class="main_div">
-		<h1>soc.net</h1>
-		<div class="reg_div">
-			<h4>Registration</h4>
-			<form action="register" method="post"  onsubmit="return checkfields();">
-				Username:<br>
-				<input type="text" name="user" id="user"> <br>
-				Password:<br>
-				<input type="password" name="password" id="password"> <br>
-				Confirm Password:<br>
-				<input type="password" name="cpassword" id="cpassword">
-				<br><br><br>
-				Name:<br>
-				<input type="text" name="name"> <br>
-				E-mail:<br>
-				<input type="text" name="email"> <br>
-				Adress:<br>
-				<input type="text" name="address"> <br>
+  <body>
+    <br>
+    <div class="intro_div">
+      <h1>soc.net</h1>
+      <div class="reg_div">
+	<h4>Registration</h4>
+	<form action="register" method="post"  onsubmit="return checkfields();">
+	  Username:<br>
+	  <input type="text" name="user" id="user"> <br>
+	  Password:<br>
+	  <input type="password" name="password" id="password"> <br>
+	  Confirm Password:<br>
+	  <input type="password" name="cpassword" id="cpassword">
+	  <br><br><br>
+	  Name:<br>
+	  <input type="text" name="name"> <br>
+	  E-mail:<br>
+	  <input type="text" name="email"> <br>
+	  Adress:<br>
+	  <input type="text" name="address"> <br>
 
 				<br>
 				Country:<br>

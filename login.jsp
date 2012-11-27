@@ -14,7 +14,7 @@
   
   <body>
     <br>
-    <div class="main_div">
+    <div class="intro_div">
       <div>
 	<h1>soc.net</h1>
       </div>
