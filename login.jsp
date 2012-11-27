@@ -38,9 +38,7 @@
 	</form>
 	
 	  <br>
-	<form method="link" action="register.jsp">
-	  <input type="submit" value="Register">
-	</form>
+	  <a href="register.jsp"><button>Register</button></a>
       </div>
     </div>
   </body>
