@@ -10,7 +10,7 @@
     <!-- LOGIN -->
     <servlet>
         <servlet-name>Login</servlet-name>
-        <servlet-class>Login</servlet-class>
+        <servlet-class>LoginSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -22,7 +22,7 @@
     <!-- REGISTER -->
     <servlet>
         <servlet-name>Register</servlet-name>
-        <servlet-class>Register</servlet-class>
+        <servlet-class>RegisterSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -33,7 +33,7 @@
    <!-- Edit -->
     <servlet>
         <servlet-name>Edit</servlet-name>
-        <servlet-class>Edit</servlet-class>
+        <servlet-class>EditSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -55,7 +55,7 @@
     <!-- LOGOUT -->
     <servlet>
         <servlet-name>Logout</servlet-name>
-        <servlet-class>Logout</servlet-class>
+        <servlet-class>LogoutSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -67,7 +67,7 @@
     <!-- NEW CHATROOM -->
     <servlet>
         <servlet-name>NewChatRoom</servlet-name>
-        <servlet-class>NewChatRoom</servlet-class>
+        <servlet-class>NewChatRoomSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -86,7 +86,7 @@
     <!-- PM -->
     <servlet>
       <servlet-name>PM</servlet-name>
-      <servlet-class>PM</servlet-class>
+      <servlet-class>PMSv</servlet-class>
     </servlet>
 
     <servlet-mapping>

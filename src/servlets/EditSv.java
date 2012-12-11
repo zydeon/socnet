@@ -5,7 +5,7 @@ import java.sql.*;
 import java.util.Date;
 import dbconnect.Database;
 
-public class Edit extends HttpServlet {
+public class EditSv extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 

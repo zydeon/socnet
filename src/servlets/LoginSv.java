@@ -4,7 +4,7 @@ import javax.servlet.http.*;
 import java.sql.*;
 import dbconnect.Database;
 
-public class Login extends HttpServlet {
+public class LoginSv extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String sql;

@@ -4,7 +4,7 @@ import javax.servlet.http.*;
 import java.sql.*;
 import dbconnect.Database;
 
-public class Logout extends HttpServlet {
+public class LogoutSv extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		request.getSession().invalidate();

@@ -5,7 +5,7 @@ import java.sql.*;
 import java.util.Date;
 import dbconnect.Database;
 
-public class NewChatRoom extends HttpServlet {
+public class NewChatRoomSv extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 	String theme = request.getParameter("new_chatroom_theme");
