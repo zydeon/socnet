@@ -9,6 +9,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <title>soc.net</title>
+    <script type="text/javascript">
+      function displayChatroom(){
+      var chatroom_list = document.getElementById('chatroom_list'); 
+      var cr = chatroom_list.options[chatroom_list.selectedIndex].value;
+      document.getElementById('chatroom_frame').src = 'chat.jsp?id='+cr;
+      }
+      function showInputTheme(){
+      document.getElementById('new_chatroom_theme').style.display='inline';
+      document.getElementById('new_chatroom_theme').style.visibility='visible';     
+      document.getElementById('new_chatroom_submit').style.display='inline';
+      document.getElementById('new_chatroom_submit').style.visibility='visible';
+      }
+    </script>    
   </head>
   
   <body>
@@ -43,16 +56,3 @@
     </div>
   </body>
 </html>
-<script type="text/javascript">
-  function displayChatroom(){
-  var chatroom_list = document.getElementById('chatroom_list'); 
-  var cr = chatroom_list.options[chatroom_list.selectedIndex].value;
-  document.getElementById('chatroom_frame').src = 'chat.jsp?id='+cr;
-  }
-  function showInputTheme(){
-  document.getElementById('new_chatroom_theme').style.display='inline';
-  document.getElementById('new_chatroom_theme').style.visibility='visible';			
-  document.getElementById('new_chatroom_submit').style.display='inline';
-  document.getElementById('new_chatroom_submit').style.visibility='visible';
-  }
-</script>

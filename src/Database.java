@@ -118,6 +118,9 @@ public class Database{
 	}
 
 	public static boolean existsCountry(String id_country){
+		if(id_country == null)
+			return false;
+
 		Connection con = Database.getConnection();
 		if(con != null){
 			try{
@@ -159,10 +162,10 @@ public class Database{
 	}
 
 
-	public static int getCityID(String city_name){
+	public static Integer getCityID(String city_name){
 		// return id_city of 'city_name'
 		// if city_name does not exist adds it and returns the new id_city
-		int id_city = -1;
+		Integer id_city = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
@@ -182,10 +185,11 @@ public class Database{
 					id_city = rs.getInt("id_city");
 
 				sql = "INSERT INTO city "
-				+ "VALUES ("+id_city+",'"+city_name+"');";
+					+ "VALUES ("+id_city+",'"+city_name+"');";
 				st.executeUpdate(sql);      
 
 				putConnection(con);
+				
 			}
 		}
 		catch( java.sql.SQLException e){
@@ -237,7 +241,11 @@ public class Database{
 		return hash;    
 	}
 
-	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name, String birthdate, String email, String address, boolean public_, boolean gender_male){
+	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name, String birthdate, String email, String address, boolean public_, Boolean gender_male){
+		/*
+			'gender_male' needs to be Boolean (capital B) to accept null values
+		 */
+		Integer id_city = null;
 		try{
 			Connection con = getConnection();
 			if(con != null){
@@ -246,8 +254,9 @@ public class Database{
 				String sql, salt, hash;
 		
 			
-				if(existsCountry(id_country)){
-					int id_city = getCityID(city_name);
+				if(id_country == null || existsCountry(id_country)){
+					if( !city_name.equals("") )
+						id_city = getCityID(city_name);
 					// generate salt
 					salt = generateSalt();
 					hash = generateHash(pass, salt);

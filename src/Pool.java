@@ -27,8 +27,11 @@ public class Pool {
 	}
 
 	public synchronized Connection getItem() throws InterruptedException {
-		available.acquire();
-		return (Connection) items.remove(0);
+		if(items.size()>0){
+			available.acquire();
+			return (Connection) items.remove(0);
+		}
+		return null;
 	}
 
 	public synchronized void putItem(Connection c) {

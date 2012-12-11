@@ -19,7 +19,7 @@ public class Register extends HttpServlet {
 		String city_name = request.getParameter("city"); //.toUpperCase();
 
 		if (id_country.equals("none"))
-				id_country=null;		
+			id_country=null;		
 
 		String day = request.getParameter("day");
 		String month = request.getParameter("month");
@@ -38,7 +38,6 @@ public class Register extends HttpServlet {
 		boolean public_ = request.getParameter("public") != null;
 
 		if(!Database.existsUser(user)){
-
 			if( Database.registerUser(user, pass, name, id_country, city_name, birthdate, email, address, public_, gender_male) ){
 				System.out.println("DEUUU");
 			}
