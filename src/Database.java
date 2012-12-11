@@ -241,7 +241,8 @@ public class Database{
 		return hash;    
 	}
 
-	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name, String birthdate, String email, String address, boolean public_, Boolean gender_male){
+	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name,
+									   String birthdate, String email, String address, boolean public_, Boolean gender_male){
 		/*
 			'gender_male' needs to be Boolean (capital B) to accept null values
 		 */
