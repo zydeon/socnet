@@ -18,8 +18,9 @@ public class LoginSv extends HttpServlet {
 		// escape(pass);
 
 		if( Database.authUser(user, pass) ){
+			System.out.println("login deu");
 			request.getSession(true).setAttribute("user", user);
-			response.sendRedirect("index.jsp");			
+			response.sendRedirect("");			
 		}
 		else{
 			response.sendRedirect("login.jsp?msg=Wrong username or password");

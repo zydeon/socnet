@@ -65,216 +65,64 @@ public class Database{
 	}
 
 	public static boolean authUser(String user, String pass){
-		try{
-			Connection con = getConnection();
-			if( con != null ){
-				Statement st = con.createStatement();
-				ResultSet rs;
-
-				String sql = "SELECT salt,disabled FROM \"user\" WHERE login='"+user+"';";
-				rs = st.executeQuery(sql);
-				if(rs.next()){
-					if (!rs.getBoolean("disabled")){
-						String salt = rs.getString("salt");
-
-						sql = "SELECT count(*) FROM \"user\" "
-							+ "WHERE login='"+user+"' AND pwhash = crypt('"+pass+"','"+salt+"');";
-
-						rs = st.executeQuery(sql);
-
-						if( rs.next() && rs.getInt("count")>0){                                     
-							putConnection(con);
-							return true;
-						}
-					}
-				}
-				putConnection(con);
-			}
-		}
-		catch(SQLException e){
-			System.out.println(e);
-		}
-		return false;
-	}
-
-	public static boolean existsUser(String user){
 		Connection con = Database.getConnection();
+		Boolean res = false;
 		if(con != null){
 			try{
-				String sql = "SELECT count(*) FROM \"user\" WHERE login='"+user+"'";
-				Statement st = con.createStatement();
-				ResultSet rs = st.executeQuery(sql);
-
-				if( rs.next() && rs.getInt("count")>0 )
-					return true;
-				
-				Database.putConnection(con);
-			}
-			catch(SQLException e){
-				System.out.println(e);
-			}
-		}
-		return false;
-	}
-
-	public static boolean existsCountry(String id_country){
-		if(id_country == null)
-			return false;
-
-		Connection con = Database.getConnection();
-		if(con != null){
-			try{
-				String sql = "SELECT count(*) FROM \"country\" WHERE id_country='"+id_country+"'";
-				Statement st = con.createStatement();
-				ResultSet rs = st.executeQuery(sql);
-
-				if( rs.next() && rs.getInt("count")>0 )
-					return true;
-				
-				Database.putConnection(con);
-			}
-			catch(SQLException e){
-				System.out.println(e);
-			}
-		}
-		return false;       
-	}
-
-	public static String getCityName(String id_city){
-		ResultSet rs = null;
-		String city_name = "";
-		try{
-			Connection con = getConnection();
-			if(con!=null){
-				Statement st = con.createStatement();
-				String query = "SELECT name FROM city WHERE id_city="+id_city+";";
-				rs = st.executeQuery(query);
-				if(rs.next())
-					city_name = rs.getString("name");
-
-				putConnection(con);
-			}
-		}
-		catch( java.sql.SQLException e){
-			System.out.println(e);
-		}
-		return city_name;
-	}
-
-
-	public static Integer getCityID(String city_name){
-		// return id_city of 'city_name'
-		// if city_name does not exist adds it and returns the new id_city
-		Integer id_city = null;
-		try{
-			Connection con = getConnection();
-			if(con!=null){
-				// CHECK IF CITY EXISTS
-				String sql = "SELECT id_city FROM \"city\" WHERE name='"+city_name+"'";
+				String sql = "SELECT auth_user('"+user+"','"+pass+"') AS success";
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
 
 				if( rs.next() )
-					return rs.getInt("id_city");
+					res = rs.getBoolean("success");
 				
-				// IF it does not exist
-				sql = "SELECT nextval('city_id_seq') AS id_city;";
-				rs = st.executeQuery(sql);
-				
-				if(rs.next())
-					id_city = rs.getInt("id_city");
-
-				sql = "INSERT INTO city "
-					+ "VALUES ("+id_city+",'"+city_name+"');";
-				st.executeUpdate(sql);      
-
-				putConnection(con);
-				
+				Database.putConnection(con);
+			}
+			catch(SQLException e){
+				System.out.println(e);
 			}
 		}
-		catch( java.sql.SQLException e){
-			System.out.println(e);
-		}
-
-		return id_city;
+		return res;
 	}
 
-	public static String generateSalt(){
-		String salt = null;     
-		try{
-			Connection con = getConnection();
-			if(con!=null){
+	public static boolean existsUser(String user){
+		Connection con = Database.getConnection();
+		Boolean res = false;
+		if(con != null){
+			try{
+				String sql = "SELECT user_exists('"+user+"') AS exists;";
 				Statement st = con.createStatement();
-				String sql = "SELECT gen_salt('md5') AS salt;";
 				ResultSet rs = st.executeQuery(sql);
-				if(rs.next())
-					salt = rs.getString("salt");
 
-				putConnection(con);
+				if( rs.next() )
+					res = rs.getBoolean("exists");
+				
+				Database.putConnection(con);
+			}
+			catch(SQLException e){
+				System.out.println(e);
 			}
 		}
-		catch(SQLException e){
-			System.out.println(e);
-		}
-
-		return salt;
+		return res;
 	}
 
-	public static String generateHash(String pass, String salt){
-		String hash = null;     
-		try{
-			Connection con = getConnection();
-			if(con!=null){
-				Statement st = con.createStatement();
-				String sql = "SELECT crypt('"+pass+"','"+salt+"') AS hash;";
-				ResultSet rs = st.executeQuery(sql);
-				if(rs.next())
-					hash = rs.getString("hash");
-
-				putConnection(con);
-			}
-		}
-		catch(SQLException e){
-			System.out.println(e);
-		}
-
-		return hash;    
-	}
-
-	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name, String birthdate, String email, String address, boolean public_, Boolean gender_male){
-		/*
-			'gender_male' needs to be Boolean (capital B) to accept null values
-		 */
+	public static boolean registerUser(String user, String pass, String name, String id_country, String city_name,
+									   String birthdate, String email, String address, boolean public_, Boolean gender_male){
 		Integer id_city = null;
-		try{
-			Connection con = getConnection();
-			if(con != null){
+		Connection con = getConnection();
+		if(con != null){
+			try{
+				String sql = "SELECT register_user('"+user+"', '"+pass+"', '"+name+"', "+id_country+", '"+city_name+"', "+birthdate+", '"+email+"', '"+address+"', "+public_+", "+gender_male+");";
 				Statement st = con.createStatement();
-				ResultSet rs;
-				String sql, salt, hash;
-		
-			
-				if(id_country == null || existsCountry(id_country)){
-					if( !city_name.equals("") )
-						id_city = getCityID(city_name);
-					// generate salt
-					salt = generateSalt();
-					hash = generateHash(pass, salt);
-
-					sql = "INSERT INTO \"user\" (login, id_city, id_country, pwhash, name, birthdate, email, gender_male, address, public, salt, disabled) "
-						+ "VALUES ('"+user+"',"+id_city+","+id_country+",'"+hash+"','"+name+"',"+birthdate+",'"+email+"',"+gender_male+",'"+address+"',"+public_+",'"+salt+"',false);";
-
-					st.executeUpdate(sql);
-					putConnection(con);
-					return true;                    
-				}
-				putConnection(con);
+				ResultSet rs = st.executeQuery(sql);
+				
+				Database.putConnection(con);
+				return true;
+			}
+			catch(SQLException e){
+				System.out.println(e);
 			}
 		}
-		catch(SQLException e){
-			System.out.println(e);
-		}
-
 		return false;
 	}
 
@@ -448,20 +296,20 @@ public class Database{
 	}
 
 	public static void updatePassword(String user, String pass){
-		ResultSet rs = null;
+		// ResultSet rs = null;
 
-		try{
-			String salt = generateSalt();
-			String hash = generateHash(pass, salt);
-			Connection con = getConnection();
-			if(con!=null){
-				Statement st = con.createStatement();
-				String query = "UPDATE \"user\" SET pwhash='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
-				st.executeUpdate(query);
-			}       
-		}catch( java.sql.SQLException e){
-			System.out.println(e);
-		}
+		// try{
+		// 	String salt = generateSalt();
+		// 	String hash = generateHash(pass, salt);
+		// 	Connection con = getConnection();
+		// 	if(con!=null){
+		// 		Statement st = con.createStatement();
+		// 		String query = "UPDATE \"user\" SET pwhash='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
+		// 		st.executeUpdate(query);
+		// 	}       
+		// }catch( java.sql.SQLException e){
+		// 	System.out.println(e);
+		// }
 	}
 
 }
