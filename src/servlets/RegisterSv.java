@@ -39,7 +39,9 @@ public class RegisterSv extends HttpServlet {
 
 		if(!Database.existsUser(user)){
 			if( Database.registerUser(user, pass, name, id_country, city_name, birthdate, email, address, public_, gender_male) ){
-				System.out.println("DEUUU");
+				System.out.println("registo deu");
+				request.getSession(true).setAttribute("user", user);
+				response.sendRedirect("");
 			}
 			else{
 				response.sendRedirect("register.jsp?msg=Problems with connection or database!");
