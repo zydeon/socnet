@@ -1,11 +1,11 @@
 <%
-	String msg = request.getParameter("msg");
-	if(msg!=null)
-		out.println( "<span style='color:red'>*"+msg+"</span>" );
+   String msg = request.getParameter("msg");
+   if(msg!=null)
+   out.println( "<span style='color:red'>*"+msg+"</span>" );
    %>
 <!DOCTYPE html>
 <html lang="en">
-
+  
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -14,7 +14,7 @@
   
   <body>
     <br>
-    <div class="intro_div">
+    <div class="main_div">
       <div>
 	<h1>soc.net</h1>
       </div>
@@ -24,8 +24,7 @@
 	<p>
 	  Jo&atilde;o Valen&ccedil;a<br>
 	  Pedro Matias<br>
-	  Carlos Ferreira(BD)<br>
-	  Tiago Matias(SD)<br>
+	  Carlos Ferreira<br>
 	</p>
       </div>
       
@@ -37,8 +36,8 @@
 	  <input type="submit" name="enter" value="Login">	  
 	</form>
 	
-	  <br>
-	  <a href="register.jsp"><button>Register</button></a>
+	<br>
+	<a href="register.jsp"><button>Register</button></a>
       </div>
     </div>
   </body>

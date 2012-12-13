@@ -37,18 +37,14 @@ public class RegisterSv extends HttpServlet {
 		
 		boolean public_ = request.getParameter("public") != null;
 
-		if(!Database.existsUser(user)){
-			if( Database.registerUser(user, pass, name, id_country, city_name, birthdate, email, address, public_, gender_male) ){
-				System.out.println("registo deu");
-				request.getSession(true).setAttribute("user", user);
-				response.sendRedirect("");
-			}
-			else{
-				response.sendRedirect("register.jsp?msg=Problems with connection or database!");
-			}
+		try{
+			Database.registerUser(user, pass, name, id_country, city_name, birthdate, email, address, public_, gender_male);
+			System.out.println("registo deu");
+			request.getSession(true).setAttribute("user", user);
+			response.sendRedirect("");			
 		}
-		else{
-			response.sendRedirect("register.jsp?msg=User already exists");
+		catch(SQLException e){
+			response.sendRedirect("register.jsp?msg="+e.getMessage());
 		}
 	}
 }
