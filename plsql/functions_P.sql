@@ -1,22 +1,15 @@
 --AD_PM()
-CREATE OR REPLACE FUNCTION add_pm(sender varchar,receiver varchar,content varchar,attach_ varchar)
+CREATE OR REPLACE FUNCTION add_pm(sender varchar,receiver varchar,content varchar,attach_pwd varchar)
 
 RETURNS BOOLEAN AS
 $$
 DECLARE
-	a_id integer;
 	m_id integer;
 	tmp boolean;
 BEGIN
 	SELECT user_exists(receiver) into tmp;
 	IF tmp IS NOT NULL THEN
-		SELECT nextval('message_id_seq') INTO m_id;
-		SELECT nextval('attach_id_seq') INTO a_id;
-		IF attach IS NOT NULL AND attach NOT LIKE '' THEN
-			   INSERT INTO attach (id_attach,id_message,attach)
-	   		   VALUES (a_id,m_id,attach_);
-		END IF ;
-	
+		SELECT nextval('message_id_seq') INTO m_id;	
 		INSERT INTO pm (id_message,"to",read)
 		       VALUES(m_id,receiver,NULL);
 		INSERT INTO messages (id_message,"from",id_attach,text,read_date,msg_type)
@@ -43,7 +36,7 @@ BEGIN
 	IF tmp IS NOT NULL THEN
 		SELECT nextval('message_id_seq') INTO m_id;
 		SELECT nextval('attach_id_seq') INTO a_id;
-		SELECT current_timestamp INTO t;		
+		SELECT current_timestamp INTO t;
 		IF attach IS NOT NULL AND attach NOT LIKE '' THEN
 			   INSERT INTO attach (id_attach,id_message,attach)
 	   		   VALUES (a_id,m_id,attach_);
