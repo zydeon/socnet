@@ -204,36 +204,37 @@ RETURNS TABLE (_login varchar, _id_city integer, _id_country integer, _name varc
 DECLARE
 	r RECORD;
 BEGIN
-	FOR r IN SELECT u.login, u.id_city, u.id_country, u.name, u.birthdate, u.email, u.gender_male, u.address, u.public, ci.name city_name, co.name country_name  FROM "user" u, city ci, country co
+	FOR r IN SELECT u.login, u.id_city, u.id_country, u."name", u.birthdate, u.email, u.gender_male, u.address, u."public", ci."name", co."name"  FROM "user" u, city ci, country co
 									WHERE ci.id_city=u.id_city AND u.id_country = co.id_country AND disabled=false
 										AND upper(login) LIKE '%' || upper(login_) || '%'
-										AND upper(city_name) LIKE '%' || upper(city_name_) || '%'
-										AND upper(country_name) LIKE '%' || upper(country_name_) || '%'
-										AND upper(name) LIKE '%' || upper(name_) || '%'
+										AND upper(co."name") LIKE '%' || upper(city_name_) || '%'
+										AND upper(co."name") LIKE '%' || upper(country_name_) || '%'
+										AND upper(u."name") LIKE '%' || upper(name_) || '%'
 										AND upper(address) LIKE '%' || upper(address_) || '%'
 										AND upper(email) LIKE '%' || upper(email_) || '%'
 	LOOP
-		IF birthdate_ IS NULL AND gender_male_ IS NULL THEN
-				RETURN NEXT;
-		ELSE
-			IF birthdate_ IS NOT NULL AND gender_male_ IS NOT NULL THEN
-				IF gender_male_ = r.gender_male AND birthdate_ = r.birthdate THEN
-					RETURN NEXT;
-				END IF;
-			ELSE
-				IF birthdate IS NOT NULL THEN
-					IF birthdate_ = r.birthdate THEN
-						RETURN NEXT;
-					END IF;
-				ELSE
-					IF gender_male_ = r.gender_male THEN
-						RETURN NEXT;
-					END IF;
-				END IF;
-			END IF;
-		END IF;
+		-- IF birthdate_ IS NULL AND gender_male_ IS NULL THEN
+				RETURN QUERY SELECT * FROM r;
+		-- ELSE
+		-- 	IF birthdate_ IS NOT NULL AND gender_male_ IS NOT NULL THEN
+		-- 		IF gender_male_ = r.gender_male AND birthdate_ = r.birthdate THEN
+		-- 			RETURN NEXT;
+		-- 		END IF;
+		-- 	ELSE
+		-- 		IF birthdate IS NOT NULL THEN
+		-- 			IF birthdate_ = r.birthdate THEN
+		-- 				RETURN NEXT;
+		-- 			END IF;
+		-- 		ELSE
+		-- 			IF gender_male_ = r.gender_male THEN
+		-- 				RETURN NEXT;
+		-- 			END IF;
+		-- 		END IF;
+		-- 	END IF;
+		-- END IF;
 
 	END LOOP;
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;
