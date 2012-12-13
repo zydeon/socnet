@@ -32,7 +32,7 @@
       <hr>
       <form>
 	<button formaction="edit_profile.jsp" formmethod="get">To Profile</button>
-	<button formaction="" formmethod="get">To PM's</button>
+	<a href="pm.jsp"><button>To PM's</button></a>
       </form>
       <form action="logout" method="get"> 
 	<button>Logout</button>  

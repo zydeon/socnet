@@ -149,11 +149,27 @@ $$
 LANGUAGE plpgsql;
 
 
--- ADD_POST()
-CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender_login varchar, texto varchar, int parent string attach
-RETURNS VOID AS $$
+--AD_POST() TRANSACTION
+CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender varchar, content varchar, parent integer, attach_ varchar, rlevel_ integer)
+
+RETURNS VOID AS
+$$
+DECLARE
+	m_id integer;
+	tmp boolean;
 BEGIN
-	-- CRIAR POST
+	SELECT user_exists(receiver) into tmp;
+	IF tmp IS NOT NULL THEN
+		SELECT nextval('message_id_seq') INTO m_id;	
+		INSERT INTO message (id_message,"from",text,read_date,msg_type)
+		       VALUES(m_id,sender,content,null,'b',attach);
+		INSERT INTO post (id_message,id_parent,rlevel,id_chatroom,attach_)
+		       VALUES(m_id,parent,rlevel_,chatroom);
+	END IF;	     
+EXCEPTION
+	WHEN unique_violation THEN
+		RAISE EXCEPTION 'Post failure';
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;

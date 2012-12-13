@@ -204,6 +204,7 @@ RETURNS TABLE (_login varchar, _id_city integer, _id_country integer, _name varc
 DECLARE
 	r RECORD;
 BEGIN
+<<<<<<< HEAD
 	FOR r IN SELECT u.login, u.id_city, u.id_country, u."name", u.birthdate, u.email, u.gender_male, u.address, u."public", ci."name", co."name"  FROM "user" u, city ci, country co
 									WHERE ci.id_city=u.id_city AND u.id_country = co.id_country AND disabled=false
 										AND upper(login) LIKE '%' || upper(login_) || '%'
@@ -212,6 +213,16 @@ BEGIN
 										AND upper(u."name") LIKE '%' || upper(name_) || '%'
 										AND upper(address) LIKE '%' || upper(address_) || '%'
 										AND upper(email) LIKE '%' || upper(email_) || '%'
+=======
+	FOR r IN SELECT u.login, u.id_city, u.id_country, u.name, u.birthdate, u.email, u.gender_male, u.address, u.public, ci.name "city_name", co.name country_name  FROM "user" u, city ci, country co
+			WHERE ci.id_city=u.id_city AND u.id_country = co.id_country AND disabled=false
+				AND upper(login) LIKE '%' || upper(login_) || '%'
+				AND upper(city_name) LIKE '%' || upper(city_name_) || '%'
+				AND upper(country_name) LIKE '%' || upper(country_name_) || '%'
+				AND upper(name) LIKE '%' || upper(name_) || '%'
+				AND upper(address) LIKE '%' || upper(address_) || '%'
+				AND upper(email) LIKE '%' || upper(email_) || '%'
+>>>>>>> a64ffeb5ffcc30a512eeda4b63ddfa213c218c2e
 	LOOP
 		-- IF birthdate_ IS NULL AND gender_male_ IS NULL THEN
 				RETURN QUERY SELECT * FROM r;
