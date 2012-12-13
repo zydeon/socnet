@@ -1,37 +1,12 @@
-<br>
-<h3>NEW MESSAGE</h3>
-<br>
-<%
-	String msg = request.getParameter("msg");
-	if(msg!=null)
-		out.println( "<span style='color:red'>*"+msg+"</span>" );
-%>
-
-<form action="pm" method="post">
-  To:
-  <input type="text" name="to">
-  <br>
-  <textarea name="text" rows="10" columns="100" style="resize:none;">
-    
-  </textarea>
-  <br>
-  <input type="submit" value="PM">;
-</form>
-
-
-<!--
-
-
+<%@ page import="dbconnect.Database"%>
 <jsp:include page="auth.jsp"></jsp:include>
-<%@ page import="socnet1.RMIClient"%>
-<%@ page import="socnet1.PM"%>
 <%@ page import="java.util.ArrayList"%>
 
-<%  RMIClient c = (RMIClient) session.getAttribute("rmi");
-    ArrayList<String> usernames = c.rmiServer.getUserNames();
-    usernames.remove(c.username);
-    PM[] pms = c.rmiServer.getAllPMs(c.username);
-    %>
+<% 
+   ArrayList<String> usernames = Database.getUserNames();
+   usernames.remove(session.getAttribute("username"));
+   java.sql.ResultSet pms = Database.getAllPMs(session.getAttribute("username"));
+   %>
 
 <html>
   <head>	
@@ -81,4 +56,3 @@
 
   </body>
 </html>
--->
