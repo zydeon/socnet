@@ -24,7 +24,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- GENERATE_HASHpass_)
+-- GENERATE_HASH
 saltE OR REPLACE FUNCTION generate_hash(pass varchar, salt varchar) RETURNS varchar AS $$
 DECLARE
 	hash 	varchar;
