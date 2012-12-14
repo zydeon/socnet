@@ -106,26 +106,43 @@ public class Database{
 		return res;
 	}
 
-    public static ArrayList<String> getUserNames(){
-		Connection con = Database.getConnection();
-		ArrayList<String> names = new ArrayList<String>();
-		if(con != null){
-		    try{
-				String sql = "SELECT get_all_users()";
-				Statement st = con.createStatement();
-				ResultSet rs = st.executeQuery(sql);
-				while(rs.next())
-				    names.add(rs.getString(1));
-				
-				Database.putConnection(con);
-			}
-		    catch(SQLException e){
-				System.out.println(e);
-	    	}
-		}
-		return names;
+    public static ArrayList<String> getUserNames() throws SQLException{
+	Connection con = Database.getConnection();
+	String sql = "SELECT get_all_users()";
+	Statement st = con.createStatement();
+	ResultSet rs = st.executeQuery(sql);
+	ArrayList<String> names = new ArrayList<String>();
+	if(con != null){
+	    try{
+		while(rs.next())
+		    names.add(rs.getString(1));
+		
+		Database.putConnection(con);
+	    }catch(SQLException e){
+		System.out.println(e);
+	    }
+	}
+	return names;
     }
-
+    
+    public static boolean registerUser(String user, String pass, String name, String id_country, String city_name,
+				       String birthdate, String email, String address, boolean public_, Boolean gender_male){
+	Integer id_city = null;
+	Connection con = getConnection();
+	if(con != null){
+	    try{
+		String sql = "SELECT register_user('"+user+"', '"+pass+"', '"+name+"', "+id_country+", '"+city_name+"', "+birthdate+", '"+email+"', '"+address+"', "+public_+", "+gender_male+");";
+		Statement st = con.createStatement();
+		ResultSet rs = st.executeQuery(sql);
+		
+		Database.putConnection(con);
+	    }
+	    catch(SQLException e){
+		System.out.println(e);
+	    }
+	}
+	return names;
+    }
 	public static void registerUser(String user, String pass, String name, String id_country, String city_name,
 									   String birthdate, String email, String address, boolean public_, Boolean gender_male) throws SQLException{
 		Integer id_city = null;

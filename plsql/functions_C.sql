@@ -106,7 +106,7 @@ BEGIN
 		IF n < 1 THEN
 			INSERT INTO restrictions ("user",id_chatroom,read) VALUES (login_, id_chatroom_, read_);
 		ELSE
-			UPDATE restrictions SET read=read_;
+			UPDATE restrictions SET read=read_ WHERE id_chatroom=id_chatroom_ AND "user"=login_;
 		END IF;
 	END IF;
 		
@@ -128,7 +128,7 @@ $$
 LANGUAGE plpgsql;
 
 
---AD_POST() TRANSACTION
+--ADD_POST() TRANSACTION
 CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender varchar, content varchar, parent integer, attach_ varchar, rlevel_ integer)
 
 RETURNS VOID AS
@@ -149,6 +149,55 @@ EXCEPTION
 	WHEN unique_violation THEN
 		RAISE EXCEPTION 'Post failure';
 	RETURN;
+END;
+$$
+LANGUAGE plpgsql;
+
+--CAN_RATE()
+CREATE OR REPLACE FUNCTION can_rate(username varchar, chatroom_id numeric)
+
+RETURNS boolean AS
+$$
+DECLARE
+	tmp integer:=0;
+BEGIN
+	SELECT count(*) INTO tmp FROM message m, post p WHERE id_chatroom=chatroom_id AND m.id_message=p.id_message;
+	IF tmp > 0 THEN
+		-- tmp:=0;
+		-- SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+		-- IF tmp <= 0 THEN
+		RETURN true;
+		-- END IF;
+	END IF;
+	RETURN false;
+END;
+$$
+LANGUAGE plpgsql;
+
+--RATE_CHATROOM()
+CREATE OR REPLACE FUNCTION rate_chatroom(username varchar, chatroom_id numeric, rate_ char)
+
+RETURNS VOID AS
+$$
+DECLARE
+	can boolean:=false;
+	tmp integer:=0;
+BEGIN
+	IF rate_ IS NULL THEN
+		DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
+	ELSE
+		SELECT can_rate(username, chatroom_id) INTO can;
+		IF can = true THEN
+			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+			IF tmp < 0 THEN
+				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user"=username;
+			ELSE
+				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
+			END IF;
+		ELSE
+			RAISE EXCEPTION 'Only users with post in the chatroom can rate.';
+		END IF;
+	END IF;
 END;
 $$
 LANGUAGE plpgsql;
