@@ -31,3 +31,12 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION teste()
+RETURNS VOID AS $$
+BEGIN
+	UPDATE chat_room SET ratesY=(ratesY+1)
+	WHERE id_chatroom = 11;
+END;
+$$
+LANGUAGE plpgsql;

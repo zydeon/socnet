@@ -26,7 +26,7 @@ BEGIN
 	RETURN;
 END;
 $$
-LANGUAGE plpgsql;§
+LANGUAGE plpgsql;
 
 -- GET_COUNTRIES()
 CREATE OR REPLACE FUNCTION get_countries()
@@ -61,11 +61,11 @@ RETURNS VOID AS $$
 BEGIN
 	INSERT INTO chat_room (creator, theme) VALUES (creator_, theme_);
 	EXCEPTION WHEN unique_violation THEN
-		RAISE EXCEPTION 'Error: theme already exists';
+		RAISE EXCEPTION 'theme already exists';
 	WHEN foreign_key_violation THEN
-		RAISE EXCEPTION 'Error: invalid creator login';
+		RAISE EXCEPTION 'invalid creator login';
 	WHEN OTHERS THEN
-		RAISE EXCEPTION 'Error: system error';
+		RAISE EXCEPTION 'system error';
 
 END;
 $$
@@ -79,13 +79,13 @@ DECLARE
 BEGIN
 	SELECT count(*) INTO n from chat_room WHERE id_chatroom=id_chatroom_ AND creator=creator_;
 	IF n < 1 THEN
-		RAISE EXCEPTION 'Error: this action can only be performed by the chatroom creator';
+		RAISE EXCEPTION 'this action can only be performed by the chatroom creator';
 	END IF;
 	UPDATE chat_room SET theme=theme_, closed=closed_ WHERE id_chatroom=id_chatroom_;
 	EXCEPTION WHEN unique_violation THEN
-		RAISE EXCEPTION 'Error: theme already exists';
+		RAISE EXCEPTION 'theme already exists';
 	WHEN foreign_key_violation THEN
-		RAISE EXCEPTION 'Error: invalid creator login';
+		RAISE EXCEPTION 'invalid creator login';
 
 END;
 $$
@@ -111,7 +111,7 @@ BEGIN
 	END IF;
 		
 	EXCEPTION WHEN foreign_key_violation THEN
-		RAISE EXCEPTION 'Error: invalid creator login or chatroom id';
+		RAISE EXCEPTION 'invalid creator login or chatroom id';
 
 END;
 $$
@@ -201,3 +201,21 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+
+-- GET_CHATROOM_THEME()
+CREATE OR REPLACE FUNCTION get_chatroom_theme(id integer)
+RETURNS varchar AS
+$$
+DECLARE theme_ varchar;
+BEGIN
+	SELECT theme INTO theme_ FROM chat_room WHERE id_chatroom = id;
+	IF theme_ IS NOT NULL THEN
+		RETURN theme_;
+	ELSE
+		RAISE EXCEPTION 'Invalid chatroom';
+	END IF;		
+END;
+$$
+LANGUAGE plpgsql;
+

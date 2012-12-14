@@ -13,17 +13,3 @@ public class PMSv extends HttpServlet{
 	Database.addPM(to,text,from);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

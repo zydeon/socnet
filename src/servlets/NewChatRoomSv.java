@@ -8,9 +8,16 @@ import dbconnect.Database;
 public class NewChatRoomSv extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-	String theme = request.getParameter("new_chatroom_theme");
-	Database.addChatRoom(theme, (String) request.getSession().getAttribute("user")  );
-	response.sendRedirect("index.jsp");
+    	System.out.println("TESTE");
+		String theme = request.getParameter("new_chatroom_theme");
+		try{
+			Database.addChatRoom(theme, (String) request.getSession().getAttribute("user")  );	
+			response.sendRedirect("");
+		}
+		catch( java.sql.SQLException e){
+			response.sendRedirect("?msg="+e.getMessage());
+		}
+		
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

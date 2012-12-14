@@ -33,7 +33,7 @@
    <!-- Edit -->
     <servlet>
         <servlet-name>Edit</servlet-name>
-        <servlet-class>EditSv</servlet-class>
+        <servlet-class>EditProfileSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -44,13 +44,35 @@
     <!-- Disable Account -->
     <servlet>
         <servlet-name>Disable</servlet-name>
-        <servlet-class>Disable</servlet-class>
+        <servlet-class>DisableSv</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>Disable</servlet-name>
         <url-pattern>/disable</url-pattern>
     </servlet-mapping> 
+
+    <!-- Enable Account -->
+    <servlet>
+        <servlet-name>Enable</servlet-name>
+        <servlet-class>EnableSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Enable</servlet-name>
+        <url-pattern>/enable</url-pattern>
+    </servlet-mapping> 
+
+    <!-- Delete info -->
+    <servlet>
+        <servlet-name>DeleteInfo</servlet-name>
+        <servlet-class>DeleteInfoSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeleteInfo</servlet-name>
+        <url-pattern>/deleteInfo</url-pattern>
+    </servlet-mapping>         
 
     <!-- LOGOUT -->
     <servlet>
@@ -61,7 +83,18 @@
     <servlet-mapping>
         <servlet-name>Logout</servlet-name>
         <url-pattern>/logout</url-pattern>
-    </servlet-mapping>       
+    </servlet-mapping>  
+
+    <!-- CHAT -->
+    <servlet>
+        <servlet-name>Chat</servlet-name>
+        <servlet-class>ChatSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Chat</servlet-name>
+        <url-pattern>/chat</url-pattern>
+    </servlet-mapping>           
 
 
     <!-- NEW CHATROOM -->

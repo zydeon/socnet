@@ -2,7 +2,7 @@
    String msg = request.getParameter("msg");
    if(msg!=null)
    out.println( "<span style='color:red'>*"+msg+"</span>" );
-   %>
+%>
 <!DOCTYPE html>
 <html lang="en">
   
