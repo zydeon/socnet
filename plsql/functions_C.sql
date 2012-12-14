@@ -26,7 +26,7 @@ BEGIN
 	RETURN;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql;§
 
 -- GET_COUNTRIES()
 CREATE OR REPLACE FUNCTION get_countries()
