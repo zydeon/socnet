@@ -189,7 +189,7 @@ BEGIN
 		SELECT can_rate(username, chatroom_id) INTO can;
 		IF can = true THEN
 			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
-			IF tmp < 0 THEN
+			IF tmp > 0 THEN
 				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user"=username;
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
