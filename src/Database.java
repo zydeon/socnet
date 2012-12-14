@@ -1,4 +1,4 @@
-package dbconnect;      // needs package to be imported to JSP
+package dbconnect;	// needs package to be imported to JSP
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -7,13 +7,13 @@ import java.security.SecureRandom;
 
 public class Database{
 
-    private static final int MAX_CONNECTIONS=15;
-    private static final String dbUrl = "jdbc:postgresql://localhost/socnet";
-    private static final String dbUser = "socnet_user";
-    private static final String dbPassword = "dbdb";
-    private static boolean initialized = false;
+	private static final int MAX_CONNECTIONS=15;
+	private static final String dbUrl = "jdbc:postgresql://localhost/socnet";
+	private static final String dbUser = "socnet_user";
+	private static final String dbPassword = "dbdb";
+	private static boolean initialized = false;
 
-    private static Pool connectionsPool;
+	private static Pool connectionsPool;
 
 	public static void init(){
 		if(!initialized){
@@ -22,18 +22,18 @@ public class Database{
 			System.out.println("Database initialized!!! ");
 			System.out.println("Pool size = "+connectionsPool.getSize());
 		}
-    }
+	}
 
 	public static void destroy(){
 		if(initialized)
-		connectionsPool.destroy();
+			connectionsPool.destroy();
 	}
 
 	public static Connection createConnection(){
 		Connection con = null;
 		try{
-			// DATABASE CONNECTION
-			// Class.forName("com.mysql.jdbc.Driver").newInstance(); //not needed
+	    // DATABASE CONNECTION
+	    // Class.forName("com.mysql.jdbc.Driver").newInstance(); //not needed
 			con = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
 
 		}
@@ -325,23 +325,6 @@ public class Database{
 		// 		st.setBoolean(2, disabled);
 		// 		st.executeUpdate();
 		// 	}
-		// }catch( java.sql.SQLException e){
-		// 	System.out.println(e);
-		// }
-	}	
-
-	public static void updatePassword(String user, String pass){
-		// ResultSet rs = null;
-
-		// try{
-		// 	String salt = generateSalt();
-		// 	String hash = generateHash(pass, salt);
-		// 	Connection con = getConnection();
-		// 	if(con!=null){
-		// 		Statement st = con.createStatement();
-		// 		String query = "UPDATE \"user\" SET pwhash='"+hash+"', salt='"+salt+"' WHERE login='"+user+"'";
-		// 		st.executeUpdate(query);
-		// 	}       
 		// }catch( java.sql.SQLException e){
 		// 	System.out.println(e);
 		// }
