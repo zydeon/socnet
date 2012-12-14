@@ -99,12 +99,14 @@ BEGIN
 
 	INSERT INTO "user"
 	(login, id_city, id_country, pwhash, name, birthdate, email, gender_male, address, public, salt, disabled)
-	VALUES
+	VALUESx
 	(user_login, id_city_, id_country_, hash_, name_, birthdate_, email_, gender_male_, address_, public_, salt_, false);
 
 EXCEPTION
 	WHEN unique_violation THEN
 		RAISE EXCEPTION 'User already exists!';
+	WHEN OTHERS THEN
+		RAISE EXCEPTION 'System error';
 
 END;
 $$

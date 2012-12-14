@@ -30,10 +30,8 @@
 	<h1>soc.net</h1>
       </div>
       <hr>
-      <form>
-	<button formaction="edit_profile.jsp" formmethod="get">To Profile</button>
+	<a href="edit_profile.jsp"><button>To Profile</button></a>
 	<a href="pm.jsp"><button>To PM's</button></a>
-      </form>
       <form action="logout" method="get"> 
 	<button>Logout</button>  
       </form>
