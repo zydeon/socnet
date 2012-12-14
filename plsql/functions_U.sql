@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION user_exists(user_login varchar) RETURNS boolean AS $$
 DECLARE
 	res 	integer;
 BEGIN
-	SELECT COUNT(*) INTO res FROM "user" WHERE login LIKE user;
+	SELECT COUNT(*) INTO res FROM "user" WHERE login LIKE user_login;
 	IF res = 1 THEN
 		RETURN true;
 	END IF;
@@ -196,6 +196,46 @@ RETURNS VOID AS
 $$
 BEGIN
 	UPDATE "user" SET disabled=disable WHERE login LIKE login_;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- SEARCH_USER()
+CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+RETURNS TABLE (_login varchar, _id_city integer, _id_country integer, _name varchar, _birthdate date, _email varchar, _gender_male boolean, _address varchar, _public boolean, _city_name varchar, _country_name varchar) AS $$
+DECLARE
+	r RECORD;
+BEGIN
+	FOR r IN SELECT u.login, u.id_city, u.id_country, u.name, u.birthdate, u.email, u.gender_male, u.address, u.public, ci.name "city_name", co.name country_name  FROM "user" u, city ci, country co
+			WHERE ci.id_city=u.id_city AND u.id_country = co.id_country AND disabled=false
+				AND upper(login) LIKE '%' || upper(login_) || '%'
+				AND upper(city_name) LIKE '%' || upper(city_name_) || '%'
+				AND upper(country_name) LIKE '%' || upper(country_name_) || '%'
+				AND upper(name) LIKE '%' || upper(name_) || '%'
+				AND upper(address) LIKE '%' || upper(address_) || '%'
+				AND upper(email) LIKE '%' || upper(email_) || '%'
+	LOOP
+		IF birthdate_ IS NULL AND gender_male_ IS NULL THEN
+				RETURN NEXT;
+		ELSE
+			IF birthdate_ IS NOT NULL AND gender_male_ IS NOT NULL THEN
+				IF gender_male_ = r.gender_male AND birthdate_ = r.birthdate THEN
+					RETURN NEXT;
+				END IF;
+			ELSE
+				IF birthdate IS NOT NULL THEN
+					IF birthdate_ = r.birthdate THEN
+						RETURN NEXT;
+					END IF;
+				ELSE
+					IF gender_male_ = r.gender_male THEN
+						RETURN NEXT;
+					END IF;
+				END IF;
+			END IF;
+		END IF;
+
+	END LOOP;
 END;
 $$
 LANGUAGE plpgsql;

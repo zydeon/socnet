@@ -7,13 +7,13 @@ import java.security.SecureRandom;
 
 public class Database{
 
-	private static final int MAX_CONNECTIONS=15;
-	private static final String dbUrl = "jdbc:postgresql://localhost/socnet";
-	private static final String dbUser = "socnet_user";
-	private static final String dbPassword = "dbdb";
-	private static boolean initialized = false;
+    private static final int MAX_CONNECTIONS=15;
+    private static final String dbUrl = "jdbc:postgresql://localhost/socnet";
+    private static final String dbUser = "socnet_user";
+    private static final String dbPassword = "dbdb";
+    private static boolean initialized = false;
 
-	private static Pool connectionsPool;
+    private static Pool connectionsPool;
 
 	public static void init(){
 		if(!initialized){
@@ -22,7 +22,7 @@ public class Database{
 			System.out.println("Database initialized!!! ");
 			System.out.println("Pool size = "+connectionsPool.getSize());
 		}
-	}
+    }
 
 	public static void destroy(){
 		if(initialized)
@@ -106,6 +106,26 @@ public class Database{
 		return res;
 	}
 
+    public static ArrayList<String> getUserNames(){
+		Connection con = Database.getConnection();
+		ArrayList<String> names = new ArrayList<String>();
+		if(con != null){
+		    try{
+				String sql = "SELECT get_all_users()";
+				Statement st = con.createStatement();
+				ResultSet rs = st.executeQuery(sql);
+				while(rs.next())
+				    names.add(rs.getString(1));
+				
+				Database.putConnection(con);
+			}
+		    catch(SQLException e){
+				System.out.println(e);
+	    	}
+		}
+		return names;
+    }
+
 	public static void registerUser(String user, String pass, String name, String id_country, String city_name,
 									   String birthdate, String email, String address, boolean public_, Boolean gender_male) throws SQLException{
 		Integer id_city = null;
@@ -150,6 +170,25 @@ public class Database{
 		}
 		catch( java.sql.SQLException e){
 			System.out.println(e);
+		}
+
+		return rs;
+	}
+
+    public static ResultSet getInbox(String username) throws SQLException{
+		ResultSet rs = null;
+
+		try{
+		    Connection con = getConnection();
+		    if(con!=null){
+			Statement st = con.createStatement();
+			String query = "SELECT ";
+			rs = st.executeQuery(query);
+			putConnection(con);
+		    }
+		}
+		catch( java.sql.SQLException e){
+		    System.out.println(e);
 		}
 
 		return rs;
