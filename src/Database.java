@@ -106,7 +106,7 @@ public class Database{
 	return res;
     }
 
-    public static ArrayList<String> getUserNames(){
+    public static ArrayList<String> getUserNames() throws SQLException{
 	Connection con = Database.getConnection();
 	String sql = "SELECT get_all_users()";
 	Statement st = con.createStatement();
