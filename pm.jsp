@@ -5,7 +5,7 @@
 <% 
    ArrayList<String> usernames = Database.getUserNames();
    usernames.remove(session.getAttribute("username"));
-   java.sql.ResultSet pms = Database.getAllPMs(session.getAttribute("username"));
+   java.sql.ResultSet pms = Database.getInbox(session.getAttribute("username"));
    %>
 
 <html>
