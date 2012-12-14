@@ -99,7 +99,7 @@ BEGIN
 
 	INSERT INTO "user"
 	(login, id_city, id_country, pwhash, name, birthdate, email, gender_male, address, public, salt, disabled)
-	VALUESx
+	VALUES
 	(user_login, id_city_, id_country_, hash_, name_, birthdate_, email_, gender_male_, address_, public_, salt_, false);
 
 EXCEPTION
@@ -199,6 +199,16 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+-- GET_USER_NAMES()
+CREATE OR REPLACE FUNCTION get_user_names()
+RETURNS TABLE (login varchar) AS $$
+BEGIN
+	RETURN QUERY SELECT u.login FROM "user" u;
+END;
+$$
+LANGUAGE plpgsql;
+
 
 -- SEARCH_USER()
 CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
