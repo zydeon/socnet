@@ -74,14 +74,12 @@ RETURNS TABLE (id_message numeric, "from" varchar, id_attach numeric, text varch
 DECLARE
 	r record;
 BEGIN
-	FOR r IN SELECT m.id_message, m."from", m.id_attach, m.text, m.read_date
+	UPDATE pm SET "read"=true WHERE id_message IN (SELECT m.id_message FROM message m, pm p
+	WHERE m.id_message = p.id_message AND p."to" LIKE username);
+	
+	RETURN QUERY SELECT m.id_message, m."from", m.id_attach, m.text, m.read_date
 	FROM message m, pm p
-	WHERE m.id_message = p.id_message AND p."to" LIKE username
-	LOOP
-		--UPDATE MESSAGES AS READ
-		RETURN NEXT;
-	END LOOP;
-	RETURN;
+	WHERE m.id_message = p.id_message AND p."to" LIKE username;
 END;
 $$
 LANGUAGE plpgsql;
@@ -90,18 +88,17 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_activity("user" varchar) RETURNS TABLE (id_message numeric, "from" varchar, id_attach numeric, text varchar, read_date date) 
 AS $$
-DECLARE
-	r record;
-BEGIN
-	FOR r IN SELECT m.id_message, m."from", m.id_attach, m.text, m.read_date
+DECLARE		
+BEGIN			
+			
+	UPDATE pm SET "read"=true WHERE id_message IN (SELECT m.id_message FROM message m, pm p
+	WHERE m.id_message = p.id_message AND 
+	m."from" LIKE "user");
+
+	RETURN QUERY SELECT m.id_message, m."from", m.id_attach, m.text, m.read_date
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND 
-	m."from" LIKE "user"
-	LOOP
-		-- UPDATE MESSAGES AS READ
-		RETURN NEXT;
-	END LOOP;
-
+	m."from" LIKE "user";
 END;
 $$
 LANGUAGE plpgsql;
