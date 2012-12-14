@@ -11,3 +11,23 @@ END;
 $$
 LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION inc_num_rates()
+RETURNS trigger AS $$
+BEGIN
+	UPDATE chat_room SET num_rates=(num_rates+1)
+	WHERE id_chatroom = NEW.id_chatroom;
+	RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dec_num_rates()
+RETURNS trigger AS $$
+BEGIN
+	UPDATE chat_room SET num_rates=(num_rates-1)
+	WHERE id_chatroom = OLD.id_chatroom;
+	RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql;
