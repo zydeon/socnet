@@ -200,52 +200,28 @@ LANGUAGE plpgsql;
 
 -- SEARCH_USER()
 CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
-RETURNS TABLE (_login varchar, _id_city integer, _id_country integer, _name varchar, _birthdate date, _email varchar, _gender_male boolean, _address varchar, _public boolean, _city_name varchar, _country_name varchar) AS $$
+RETURNS SETOF user_info AS $$
 DECLARE
 	r RECORD;
 BEGIN
-<<<<<<< HEAD
-	FOR r IN SELECT u.login, u.id_city, u.id_country, u."name", u.birthdate, u.email, u.gender_male, u.address, u."public", ci."name", co."name"  FROM "user" u, city ci, country co
-									WHERE ci.id_city=u.id_city AND u.id_country = co.id_country AND disabled=false
-										AND upper(login) LIKE '%' || upper(login_) || '%'
-										AND upper(co."name") LIKE '%' || upper(city_name_) || '%'
-										AND upper(co."name") LIKE '%' || upper(country_name_) || '%'
-										AND upper(u."name") LIKE '%' || upper(name_) || '%'
-										AND upper(address) LIKE '%' || upper(address_) || '%'
-										AND upper(email) LIKE '%' || upper(email_) || '%'
-=======
-	FOR r IN SELECT u.login, u.id_city, u.id_country, u.name, u.birthdate, u.email, u.gender_male, u.address, u.public, ci.name "city_name", co.name country_name  FROM "user" u, city ci, country co
-			WHERE ci.id_city=u.id_city AND u.id_country = co.id_country AND disabled=false
-				AND upper(login) LIKE '%' || upper(login_) || '%'
-				AND upper(city_name) LIKE '%' || upper(city_name_) || '%'
-				AND upper(country_name) LIKE '%' || upper(country_name_) || '%'
-				AND upper(name) LIKE '%' || upper(name_) || '%'
-				AND upper(address) LIKE '%' || upper(address_) || '%'
-				AND upper(email) LIKE '%' || upper(email_) || '%'
->>>>>>> a64ffeb5ffcc30a512eeda4b63ddfa213c218c2e
-	LOOP
-		-- IF birthdate_ IS NULL AND gender_male_ IS NULL THEN
-				RETURN QUERY SELECT * FROM r;
-		-- ELSE
-		-- 	IF birthdate_ IS NOT NULL AND gender_male_ IS NOT NULL THEN
-		-- 		IF gender_male_ = r.gender_male AND birthdate_ = r.birthdate THEN
-		-- 			RETURN NEXT;
-		-- 		END IF;
-		-- 	ELSE
-		-- 		IF birthdate IS NOT NULL THEN
-		-- 			IF birthdate_ = r.birthdate THEN
-		-- 				RETURN NEXT;
-		-- 			END IF;
-		-- 		ELSE
-		-- 			IF gender_male_ = r.gender_male THEN
-		-- 				RETURN NEXT;
-		-- 			END IF;
-		-- 		END IF;
-		-- 	END IF;
-		-- END IF;
-
-	END LOOP;
-	RETURN;
+	RETURN QUERY SELECT * FROM user_info
+									WHERE disabled=false
+										AND (public=public_ OR public_ IS NULL)
+										AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
+										AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
+										AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
+										AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
+										AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
+										AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
+										AND (birthdate=birthdate_ OR birthdate_ IS NULL)
+										AND (gender_male=gender_male_ OR gender_male_ IS NULL);
 END;
 $$
 LANGUAGE plpgsql;
+
+-- view table USER_INFO
+-- CREATE TABLE user_info AS 
+-- SELECT DISTINCT ON (login) login, u.name, birthdate, email, gender_male, address, public, disabled, u.id_city, ci.name city_name, u.id_country, co.name country_name 
+-- FROM "user" u, city ci, country co 
+-- WHERE (u.id_city IS NULL OR u.id_city=ci.id_city) 
+--     AND (u.id_country IS NULL OR u.id_country=co.id_country);
