@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 
 public class Database{
 
@@ -210,6 +211,45 @@ public class Database{
 
 		return rs;
 	}
+    public static ResultSet getOutbox(String username) throws SQLException{
+		ResultSet rs = null;
+
+		try{
+		    Connection con = getConnection();
+		    if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_outbox(?);");
+				st.setString(1, username);
+				rs = st.executeQuery();
+				putConnection(con);
+		    }
+		}
+		catch( java.sql.SQLException e){
+		    System.out.println(e);
+		}
+
+		return rs;
+	}
+
+    public static ResultSet getHistory(String user1, String user2) throws SQLException{
+		ResultSet rs = null;
+
+		try{
+		    Connection con = getConnection();
+		    if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_history(?,?);");
+				st.setString(1, user1);
+				st.setString(2, user2);
+				
+				rs = st.executeQuery();
+				putConnection(con);
+		    }
+		}
+		catch( java.sql.SQLException e){
+		    System.out.println(e);
+		}
+
+		return rs;
+	}
 
 	public static void userRestrict(String login, Integer id_chatroom, Boolean read){
 		try{
@@ -342,31 +382,44 @@ public class Database{
 		}
 	}
 
-	public static boolean addPM(String to,String text,String from){
-	//PM:       id_message | to | read 
-	//Message:  id_message | from | id_attach | text | read_date | sent_date | image | msg_type
+    public static boolean addPM(String from, String to,String text,String attach, String time){
+
+	System.out.println("FROM "+from+ " TO "+to+" TEXT "+text+" PATH "+attach+" TIME "+time);
 	try{
-		Connection con = getConnection();
-		if(con!=null){
-		Statement st = con.createStatement();
-		String query = 
-			"BEGIN;"+
-			"INSERT INTO message (to,type) VALUES ('"+to+"','B');"+
-			"INSERT INTO pm (text,from) VALUES ('"+text+"','"+from+"');"+
-			"COMMIT;";
+	    Connection con = getConnection();
+	    if(con!=null){
+		PreparedStatement st= null;
+		if(time == null)
+		    st = con.prepareStatement("SELECT add_pm(?,?,?,?);");
+		else 
+		    st = con.prepareStatement("SELECT add_delayed_pm(?,?,?,?,?);");
 		
-		st.executeUpdate(query);
-		putConnection(con);
+		st.setString(1, from);
+		st.setString(2, to);
+		st.setString(3, text);
+		st.setString(4, attach);
+
+		if(time != null){
+		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		    try{
+			java.util.Date parsedDate = dateFormat.parse(time);
+			java.sql.Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+			st.setTimestamp(5, timestamp);
+		    }catch(java.text.ParseException e){
+			System.out.println(e);
+		    }
+		    
 		}
-	}
-	catch( java.sql.SQLException e){
-		System.out.println(e);
-		return false;
-	}               
+
+		st.execute();
+	    }
+	}catch( java.sql.SQLException e){
+	    System.out.println(e);
+	}		
 	return true;
-	}
-
-
+    }
+    
+    
 	public static void updateProfile(String user, String pass, String city_name, Integer id_country, String name, String birthdate, String email, Boolean gender_male, String address, Boolean public_){
 		try{
 			Connection con = getConnection();

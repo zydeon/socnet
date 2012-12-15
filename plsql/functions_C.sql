@@ -76,6 +76,8 @@ CREATE OR REPLACE FUNCTION get_countries()
 RETURNS SETOF country AS $$
 BEGIN
 	RETURN QUERY SELECT * FROM country;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -85,6 +87,8 @@ CREATE OR REPLACE FUNCTION get_chatrooms()
 RETURNS SETOF chat_room AS $$
 BEGIN
 	RETURN QUERY SELECT * FROM chat_room WHERE closed=false;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -94,6 +98,8 @@ CREATE OR REPLACE FUNCTION get_chatrooms(login_ varchar)
 RETURNS SETOF chat_room AS $$
 BEGIN
 	RETURN QUERY SELECT * FROM chat_room WHERE creator LIKE login_;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -101,14 +107,21 @@ LANGUAGE plpgsql;
 -- ADD_CHATROOM()
 CREATE OR REPLACE FUNCTION add_chatroom(creator_ varchar, theme_ varchar)
 RETURNS VOID AS $$
+DECLARE
+	n integer := 0;
+	msg text:='system error';
 BEGIN
-	INSERT INTO chat_room (creator, theme) VALUES (creator_, theme_);
-	EXCEPTION WHEN unique_violation THEN
-		RAISE EXCEPTION 'theme already exists';
-	WHEN foreign_key_violation THEN
+	SELECT count(*) INTO n FROM chat_room WHERE creator=creator_ AND upper(theme) LIKE upper(theme_);
+	IF n < 1 THEN
+		INSERT INTO chat_room (creator, theme) VALUES (creator_, theme_);
+	ELSE
+		msg:='theme already exists';
+		RAISE EXCEPTION '';
+	END IF;
+	EXCEPTION WHEN foreign_key_violation THEN
 		RAISE EXCEPTION 'invalid creator login';
 	WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+		RAISE EXCEPTION '%',msg;
 
 END;
 $$
@@ -119,16 +132,30 @@ CREATE OR REPLACE FUNCTION update_chatroom(id_chatroom_ integer, creator_ varcha
 RETURNS VOID AS $$
 DECLARE
 	n integer := 0;
+	msg text:='system error';
 BEGIN
-	SELECT count(*) INTO n from chat_room WHERE id_chatroom=id_chatroom_ AND creator=creator_;
+	SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chatroom_ AND creator=creator_;
 	IF n < 1 THEN
 		RAISE EXCEPTION 'this action can only be performed by the chatroom creator';
 	END IF;
-	UPDATE chat_room SET theme=theme_, closed=closed_ WHERE id_chatroom=id_chatroom_;
-	EXCEPTION WHEN unique_violation THEN
-		RAISE EXCEPTION 'theme already exists';
-	WHEN foreign_key_violation THEN
+	IF theme_ IS NOT NULL THEN
+		SELECT count(*) INTO n FROM chat_room WHERE creator=creator_ AND upper(theme) LIKE upper(theme_);
+		IF n < 1 THEN
+			UPDATE chat_room SET theme=theme_ WHERE id_chatroom=id_chatroom_;
+		ELSE
+			msg:='theme already exists';
+			RAISE EXCEPTION '';
+		END IF;
+	END IF;
+
+	IF closed_ IS NOT NULL THEN
+		UPDATE chat_room SET closed=closed_ WHERE id_chatroom=id_chatroom_;
+	END IF;
+
+	EXCEPTION WHEN foreign_key_violation THEN
 		RAISE EXCEPTION 'invalid creator login';
+	WHEN OTHERS THEN
+		RAISE EXCEPTION '%',msg;
 
 END;
 $$
@@ -155,6 +182,8 @@ BEGIN
 		
 	EXCEPTION WHEN foreign_key_violation THEN
 		RAISE EXCEPTION 'invalid creator login or chatroom id';
+	WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 
 END;
 $$
@@ -164,8 +193,10 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION search_chatrooms(creator_ varchar, theme_ varchar)
 RETURNS SETOF chat_room AS $$
 BEGIN
-	RETURN QUERY SELECT * FROM chat_room WHERE upper(theme) LIKE '%' || upper(theme_) || '%'
-											AND upper(creator) LIKE '%' || upper(creator_) || '%';
+	RETURN QUERY SELECT * FROM chat_room WHERE (upper(theme) LIKE '%' || upper(theme_) || '%' OR theme_ IS NULL)
+											AND (upper(creator) LIKE '%' || upper(creator_) || '%' OR creator_ IS NULL);
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -194,8 +225,9 @@ CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender varchar, conten
 RETURNS VOID AS
 $$
 DECLARE
-       m_id integer;
-       n integer:=0;
+	m_id integer;
+	n integer:=0;
+	msg text:='system error';
 BEGIN
        SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE sender AND id_chatroom=id_chatroom_;
        IF n < 1 THEN
@@ -228,6 +260,8 @@ BEGIN
 		RETURN true;
 	END IF;
 	RETURN false;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -249,6 +283,8 @@ BEGIN
 	END IF;
 	END IF;
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -269,6 +305,8 @@ BEGIN
 	END IF;
 	END IF;
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -282,30 +320,34 @@ DECLARE
 	can boolean:=false;
 	tmp integer:=0;
 	r char;
+	msg text:='system error';
 BEGIN
 	IF rate_ IS NULL THEN
-		SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+		SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 		IF tmp > 0 THEN
-			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
-			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
+			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
+			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			PERFORM dec_rate(chatroom_id,r);
 		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
 		IF can = true THEN
 			PERFORM inc_rate(chatroom_id, rate_);
-			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			IF tmp > 0 THEN
-				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
-				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user"=username;
+				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
+				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 				PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
 			END IF;
 		ELSE
-			RAISE EXCEPTION 'Only users with post in the chatroom can rate.';
+			msg:='Only users with post in the chatroom can rate';
+			RAISE EXCEPTION '';
 		END IF;
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION '%',msg;
 END;
 $$
 LANGUAGE plpgsql;
@@ -316,25 +358,28 @@ CREATE OR REPLACE FUNCTION get_chatroom_theme(id integer)
 RETURNS varchar AS
 $$
 DECLARE theme_ varchar;
+	msg text:='system error';
 BEGIN
 	SELECT theme INTO theme_ FROM chat_room WHERE id_chatroom = id;
 	IF theme_ IS NOT NULL THEN
 		RETURN theme_;
 	ELSE
-		RAISE EXCEPTION 'Invalid chatroom';
-	END IF;		
+		msg:='Invalid chatroom';
+		RAISE EXCEPTION '';
+	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION '%',msg;
 END;
 $$
 LANGUAGE plpgsql;
 
-
- -- GET_CHATROOM_INFO()
+-- GET_CHATROOM_INFO()
 CREATE OR REPLACE FUNCTION get_chatroom_info(id integer)
 RETURNS SETOF chat_room AS $$
 BEGIN
-       RETURN QUERY SELECT * FROM chat_room WHERE id_chatroom=id;
-       EXCEPTION WHEN OTHERS THEN
-               RAISE EXCEPTION 'system error';
+	RETURN QUERY SELECT * FROM chat_room WHERE id_chatroom=id;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;

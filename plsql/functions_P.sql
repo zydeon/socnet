@@ -18,7 +18,8 @@ BEGIN
 EXCEPTION
 	WHEN unique_violation THEN
 		RAISE EXCEPTION 'Pm failure';
-	RETURN;
+	WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -43,6 +44,8 @@ BEGIN
 EXCEPTION
 	WHEN unique_violation THEN
 		RAISE EXCEPTION 'Delayed Pm Failure';
+	WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 	RETURN;
 END;
 $$
@@ -50,7 +53,7 @@ LANGUAGE plpgsql;
 
 --GET_HISTORY()
 CREATE OR REPLACE FUNCTION get_history(user1 varchar,user2 varchar)
-RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar, "read" boolean) AS $$
+RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar,"read" boolean,"to" varchar,file_path varchar,sent_date timestamp) AS $$
 DECLARE
 	ts timestamp;
 BEGIN
@@ -62,18 +65,21 @@ BEGIN
 	(m."from" LIKE user2 AND p.to LIKE user1)) AND
 	m.sent_date < ts);
 
-	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read"
+	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read",p."to",m.attach_path,m.sent_date
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND 
 	((m."from" LIKE user1 AND p.to LIKE user2) OR (m."from" LIKE user2 AND p.to LIKE user1)) AND
 	m.sent_date < ts;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;	
 $$
 LANGUAGE plpgsql;
 
 --GET_INBOX()
 CREATE OR REPLACE FUNCTION get_inbox(username varchar)
-RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar,"read" boolean) AS $$
+RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar,"read" boolean,"to" varchar,file_path varchar,sent_date timestamp) AS $$
 DECLARE
 	ts timestamp;
 BEGIN
@@ -81,24 +87,30 @@ BEGIN
 	UPDATE pm SET "read"=true WHERE id_message IN (SELECT m.id_message FROM message m, pm p
 	WHERE m.id_message = p.id_message AND p."to" LIKE username and m.sent_date < ts);
 	
-	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read"
+	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read",p."to",m.attach_path,m.sent_date
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND p."to" LIKE username AND m.sent_date < ts;
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;
 
---GET_ACTIVITY()
+CREATE OR REPLACE FUNCTION get_outbox("user" varchar)
+RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar,"read" boolean,"to" varchar,file_path varchar,sent_date timestamp) AS $$
 
-CREATE OR REPLACE FUNCTION get_activity("user" varchar)
-RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar, "read" boolean) 
-AS $$
 DECLARE	
 BEGIN			
-	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read"
+	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read",p."to",m.attach_path,m.sent_date
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND 
 	m."from" LIKE "user";
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;
@@ -115,6 +127,8 @@ BEGIN
 		DELETE FROM message WHERE id_message=id;
 	END IF;
 	RETURN NOT read_;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;

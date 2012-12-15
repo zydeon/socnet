@@ -8,6 +8,8 @@ BEGIN
 		RETURN true;
 	END IF;
 	RETURN false;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql
@@ -20,6 +22,8 @@ DECLARE
 BEGIN
 	SELECT INTO salt gen_salt('md5');
 	RETURN salt;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -31,6 +35,8 @@ DECLARE
 BEGIN
 	SELECT INTO hash crypt(pass, salt);
 	RETURN hash;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -54,6 +60,8 @@ BEGIN
 	END IF;
 
 	RETURN false;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql
@@ -76,6 +84,9 @@ BEGIN
 	END IF;
 
 	RETURN id;
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql
@@ -139,6 +150,8 @@ BEGIN
 		RETURN NEXT;
 	END LOOP;
 	RETURN;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -156,6 +169,8 @@ BEGIN
 		SELECT generate_hash(pass_, salt_) INTO hash_;
 		UPDATE "user" SET pwhash=hash_, salt=salt_ WHERE login LIKE login_;
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -186,6 +201,8 @@ BEGIN
 	IF pass_ IS NOT NULL AND pass_ NOT LIKE '' THEN
 		PERFORM update_password(login_,pass_);
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -196,6 +213,8 @@ RETURNS VOID AS
 $$
 BEGIN
 	UPDATE "user" SET disabled=disable WHERE login LIKE login_;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -205,6 +224,8 @@ CREATE OR REPLACE FUNCTION get_user_names()
 RETURNS TABLE (login varchar) AS $$
 BEGIN
 	RETURN QUERY SELECT u.login FROM "user" u;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -212,7 +233,35 @@ LANGUAGE plpgsql;
 -- DELETE_ACTIVITY()
 CREATE OR REPLACE FUNCTION delete_activity(userlogin varchar)
 RETURNS VOID AS $$
+DECLARE
+	r RECORD;
+	tmp integer;
 BEGIN
+	DELETE FROM message WHERE "from" LIKE userlogin AND id_message IN (SELECT id_message FROM pm WHERE read=false);
+	
+	FOR r IN SELECT * FROM rates
+		WHERE "user" LIKE userlogin
+	LOOP
+		PERFORM rate_chatroom(userlogin, r.id_chatroom, null);
+	END LOOP;
+
+	FOR r IN SELECT * FROM post
+		WHERE id_message IN (SELECT id_message FROM message WHERE "from" LIKE userlogin)
+		ORDER BY rlevel DESC
+	LOOP
+		tmp:=0;
+		SELECT count(*) INTO tmp FROM post WHERE id_parent=r.id_message;
+		IF tmp = 0 THEN
+			DELETE FROM message WHERE id_message=r.id_message;
+		END IF;
+	END LOOP;
+
+	DELETE FROM chat_room WHERE creator LIKE userlogin AND id_chatroom NOT IN (SELECT id_chatroom FROM post);
+
+	PERFORM update_profile(userlogin, null, null, null, null, null, null, null, null, false);
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -244,17 +293,19 @@ RETURNS SETOF user_info AS $$
 DECLARE
        r RECORD;
 BEGIN
-       RETURN QUERY SELECT * FROM user_info
-                                       WHERE disabled=false
-                                               AND (public=public_ OR public_ IS NULL)
-                                               AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
-                                               AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
-                                               AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
-                                               AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
-                                               AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
-                                               AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
-                                               AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
-                                               AND (gender_male=gender_male_ OR gender_male_ IS NULL);
+	RETURN QUERY SELECT * FROM user_info
+					WHERE disabled=false
+						AND (public=public_ OR public_ IS NULL)
+						AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
+						AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
+						AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
+						AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
+						AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
+						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
+						AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
+						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
