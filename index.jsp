@@ -1,7 +1,10 @@
 <%@ page import="dbconnect.Database"%>
 <jsp:include page="auth.jsp"></jsp:include>
-<% java.sql.ResultSet chatrooms = Database.getChatrooms(); %> 
-<%
+<% java.sql.ResultSet chatrooms = (java.sql.ResultSet) request.getAttribute("searchedChats"); %>
+<% if(chatrooms==null) { %>
+<% 		chatrooms = Database.getChatrooms(); %> 
+<% } %>
+<% 
    String msg = request.getParameter("msg");
    if(msg!=null)
    out.println( "<span style='color:red'>*"+msg+"</span>" );
@@ -53,8 +56,18 @@
 			</select>
 		</div>
 		<div style="float:left;">
-			<iframe width=500 height=1000 id="chatroom_frame" src="chat" />
+			<iframe width=500 height=1000 id="chatroom_frame" src="chat"></iframe>
 		</div>
+
+		<!-- SEARCH CHATS -->
+		<div>
+			<form action="searchChats" method="post">
+				Theme: <input type="text" name="theme"> <br>
+				Creator: <input type="text" name="creator"> <br>
+				<input type="submit" value="Search">
+			</form>
+		</div>
+
 	</div>
 </body>
 </html>
