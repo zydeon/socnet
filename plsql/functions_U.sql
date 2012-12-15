@@ -212,7 +212,7 @@ LANGUAGE plpgsql;
 -- DELETE_ACTIVITY()
 CREATE OR REPLACE FUNCTION delete_activity(userlogin varchar)
 RETURNS VOID AS $$
-
+BEGIN
 END;
 $$
 LANGUAGE plpgsql;
