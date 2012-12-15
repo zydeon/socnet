@@ -40,6 +40,7 @@
 		<a href="edit_profile.jsp"><button>Edit Profile</button></a>
 		<a href="pm?list=inbox"><button>To PM's</button></a>
 		<a href="logout"><button>Logout</button></a>
+		<a href="manage_chatrooms.jsp"><button>Manage chatrooms</button></a>
 		<button onclick="showInputTheme()">Create chatroom</button>
 		<form action="new_chatroom" method="post">
 			<input type="text" name="new_chatroom_theme" id="new_chatroom_theme" placeholder="Theme" style="visibility:hidden">

@@ -15,11 +15,17 @@ public class EditProfileSv extends HttpServlet {
 		String name = request.getParameter("name");
 		String pass = request.getParameter("password");
 
-		Integer id_country = Integer.parseInt(request.getParameter("country")); //.toUpperCase();
+		String id_country_ = request.getParameter("country");
+		Integer id_country;
+		if (id_country_.equals("none"))
+			id_country=null;
+		else
+			id_country = Integer.parseInt(id_country_);
+
+
 		String city = request.getParameter("city"); //.toUpperCase();
 
-		if (id_country.equals("none"))
-			id_country=null;
+
 
 		String day = request.getParameter("day");
 		String month = request.getParameter("month");
