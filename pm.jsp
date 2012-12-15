@@ -12,14 +12,14 @@
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <title></title>
     <script type="text/javascript">
-    function outputPM(from,to,text,date,id,file_path){
-	var html = "<div class=post_div id='"+id+"'>"+
+      function outputPM(from,to,text,date,id,file_path){
+      var html = "<div class=post_div id='"+id+"'>"+
 	    "FROM "+from+" "+
 	    "TO "+to+"<br>"+
 	    "at "+date +"<br>"+
 	    "<p> "+text+"</p><br>";
 	if(file_path!="null"){
-	    html += "<a href='"+filePath+"'>Anexo</a>"
+	    html += "<a href='"+file_path+"'>Anexo</a>"
 	}	
 	html+="</div><br><br>";
 	document.write(html);

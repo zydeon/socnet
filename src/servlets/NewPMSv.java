@@ -25,7 +25,7 @@ public class NewPMSv extends HttpServlet {
 		if(time.equals(""))
 		    time=null;
 		Database.addPM(from,to,text,filePath,time);
-
+		System.out.println(filePath);
 		response.sendRedirect("pm?list=inbox");
 	}	
 

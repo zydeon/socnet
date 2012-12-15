@@ -192,4 +192,15 @@
         <url-pattern>/pm</url-pattern>
     </servlet-mapping>   
 
+    <!-- Rates -->
+    <servlet>
+      <servlet-name>Rate</servlet-name>
+      <servlet-class>rateSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Rate</servlet-name>
+        <url-pattern>/rate</url-pattern>
+    </servlet-mapping>   
+
 </web-app>
