@@ -273,11 +273,11 @@ RETURNS VOID AS
 $$
 BEGIN
 	IF upper(rate_) = 'Y' THEN
-		UPDATE chatroom SET ratesY=(ratesY+1) WHERE id_chatroom=chatroom_id;
+		UPDATE chat_room SET ratesY=(ratesY+1) WHERE id_chatroom=chatroom_id;
 	ELSE IF upper(rate_) = 'M' THEN
-			UPDATE chatroom SET ratesM=(ratesM+1) WHERE id_chatroom=chatroom_id;
+		UPDATE chat_room SET ratesM=(ratesM+1) WHERE id_chatroom=chatroom_id;
 	ELSE IF upper(rate_) = 'N' THEN
-				UPDATE chatroom SET ratesN=(ratesN+1) WHERE id_chatroom=chatroom_id;
+		UPDATE chat_room SET ratesN=(ratesN+1) WHERE id_chatroom=chatroom_id;
 	ELSE
 		RAISE EXCEPTION 'Invalid rate!';
 	END IF;
@@ -295,17 +295,17 @@ RETURNS VOID AS
 $$
 BEGIN
 	IF upper(rate_) = 'Y' THEN
-		UPDATE chatroom SET ratesY=(ratesY-1) WHERE id_chatroom=chatroom_id;
+		UPDATE chat_room SET ratesY=(ratesY-1) WHERE id_chatroom=chatroom_id;
 	ELSE IF upper(rate_) = 'M' THEN
-		UPDATE chatroom SET ratesM=(ratesM-1) WHERE id_chatroom=chatroom_id;
+		UPDATE chat_room SET ratesM=(ratesM-1) WHERE id_chatroom=chatroom_id;
 	ELSE IF upper(rate_) = 'N' THEN
-		UPDATE chatroom SET ratesN=(ratesN-1) WHERE id_chatroom=chatroom_id;
+		UPDATE chat_room SET ratesN=(ratesN-1) WHERE id_chatroom=chatroom_id;
 	ELSE
 		RAISE EXCEPTION 'Invalid rate!';
 	END IF;
 	END IF;
 	END IF;
-	EXCEPTION WHEN OTHERS THEN
+		EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
 END;
 $$
@@ -327,17 +327,18 @@ BEGIN
 		IF tmp > 0 THEN
 			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
-			PERFORM dec_rate(chatroom_id,r);
+			--PERFORM dec_rate(chatroom_id,r);
 		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
 		IF can = true THEN
-			PERFORM inc_rate(chatroom_id, rate_);
+		       	--PERFORM inc_rate(chatroom_id, rate_);
+			SELECT * FROM inc_rate(chatroom_id, rate_);
 			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			IF tmp > 0 THEN
 				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user" LIKE username;
-				PERFORM dec_rate(chatroom_id,r);
+			--	PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
 			END IF;

@@ -43,7 +43,7 @@ public class Database{
 		}
 		return con;
 	}
-
+    
 	public static synchronized Connection getConnection( ){
 		if( initialized ){
 			try{
@@ -540,5 +540,23 @@ public class Database{
 		// 	System.out.println(e);
 		// }
 	}
+
+    public static void addRate(String user, int chatroom,String rate) throws java.sql.SQLException{
+	ResultSet rs = null;
+	System.out.println(user + chatroom + rate);
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM rate_chatroom(?,?,?);");
+				st.setString(1, user);
+				st.setInt(2, chatroom);			     
+				st.setString(3,rate);
+
+				st.execute();
+			}
+		}catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+	}	
 
 }

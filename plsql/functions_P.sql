@@ -10,8 +10,8 @@ BEGIN
 	SELECT user_exists(receiver) into tmp;
 	IF tmp IS NOT NULL THEN
 		SELECT nextval('message_id_seq') INTO m_id;	
-		INSERT INTO message (id_message,"from",text,read_date,msg_type)
-		       VALUES(m_id,sender,content,null,'A');
+		INSERT INTO message (id_message,"from",text,read_date,msg_type,attach_path)
+		       VALUES(m_id,sender,content,null,'A',attach_);
 		INSERT INTO pm (id_message,"to",read)
 		       VALUES(m_id,receiver,false);
 	END IF;	     
@@ -36,8 +36,8 @@ BEGIN
 	SELECT user_exists(receiver) into tmp;
 	IF tmp IS NOT NULL THEN
 		SELECT nextval('message_id_seq') INTO m_id;	
-		INSERT INTO message (id_message,"from",text,read_date,sent_date,msg_type)
-		       VALUES(m_id,sender,content,null,ts,'A');
+		INSERT INTO message (id_message,"from",text,read_date,sent_date,msg_type,attach_path)
+		       VALUES(m_id,sender,content,null,ts,'A',attach);
 		INSERT INTO pm (id_message,"to",read)
 		       VALUES(m_id,receiver,false);
 	END IF;	     
@@ -69,7 +69,8 @@ BEGIN
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND 
 	((m."from" LIKE user1 AND p.to LIKE user2) OR (m."from" LIKE user2 AND p.to LIKE user1)) AND
-	m.sent_date < ts;
+	m.sent_date < ts
+	ORDER BY m.sent_date DESC;
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
 	RETURN;
@@ -89,7 +90,8 @@ BEGIN
 	
 	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read",p."to",m.attach_path,m.sent_date
 	FROM message m, pm p
-	WHERE m.id_message = p.id_message AND p."to" LIKE username AND m.sent_date < ts;
+	WHERE m.id_message = p.id_message AND p."to" LIKE username AND m.sent_date < ts
+	ORDER BY m.sent_date DESC;
 
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
@@ -106,7 +108,8 @@ BEGIN
 	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read",p."to",m.attach_path,m.sent_date
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND 
-	m."from" LIKE "user";
+	m."from" LIKE "user"
+	ORDER BY m.sent_date DESC;
 
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';

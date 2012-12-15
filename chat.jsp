@@ -51,7 +51,7 @@ if(msg!=null)
 			"<input type='hidden' name='id_chatroom' value='"+id_chatroom+"'>"+
 			"<input type='file' name='attach'>"+
 			"<input type='submit' value='Submit'>"+
-			"</form>"+
+	  "</form>"+
 			"</div>";
 
 			document.write(html);
@@ -67,7 +67,10 @@ if(msg!=null)
 		<% String id_chatroom = (String) request.getAttribute("id_chatroom"); %>
 		
 		<h4><%=theme%></h4>
-
+		<a href="rate?r=Y&id=<%=id_chatroom%>"><button>Y</button></a>
+		<a href="rate?r=M&id=<%=id_chatroom%>"><button>M</button></a>
+		<a href="rate?r=N&id=<%=id_chatroom%>"><button>N</button></a>
+		<hr><br>
 		<script type="text/javascript"> newPost("<%=id_chatroom%>"); </script>
 
 		<% while( posts.next() ) { %>
