@@ -178,6 +178,7 @@ LANGUAGE plpgsql;
 
 --ADD_POST() TRANSACTION
 CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender varchar, content varchar, parent integer, attach_ varchar, rlevel_ integer)
+
 RETURNS VOID AS
 $$
 DECLARE
@@ -308,6 +309,7 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
 
 -- GET_CHATROOM_THEME()
 CREATE OR REPLACE FUNCTION get_chatroom_theme(id integer)
