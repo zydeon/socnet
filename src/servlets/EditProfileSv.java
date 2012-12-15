@@ -5,7 +5,7 @@ import java.sql.*;
 import java.util.Date;
 import dbconnect.Database;
 
-public class EditSv extends HttpServlet {
+public class EditProfileSv extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -15,13 +15,11 @@ public class EditSv extends HttpServlet {
 		String name = request.getParameter("name");
 		String pass = request.getParameter("password");
 
-		String country = request.getParameter("country"); //.toUpperCase();
+		Integer id_country = Integer.parseInt(request.getParameter("country")); //.toUpperCase();
 		String city = request.getParameter("city"); //.toUpperCase();
 
-		if (country.equals("none"))
-			country=null;
-
-		Integer id_city = null;
+		if (id_country.equals("none"))
+			id_country=null;
 
 		String day = request.getParameter("day");
 		String month = request.getParameter("month");
@@ -40,12 +38,9 @@ public class EditSv extends HttpServlet {
 			
 		Boolean public_ = request.getParameter("public") != null;
 
-		if (!pass.equals(""))
-			Database.updatePassword(user, pass);
-		Database.updateProfile(user, public_, gender_male, birthdate, email, address, name, country);
+		Database.updateProfile(user, pass, city, id_country, name, birthdate, email, gender_male, address, public_ );
 
-
-		response.sendRedirect("index.jsp");
+		response.sendRedirect("");
 
     }
 

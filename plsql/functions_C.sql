@@ -61,11 +61,11 @@ RETURNS VOID AS $$
 BEGIN
 	INSERT INTO chat_room (creator, theme) VALUES (creator_, theme_);
 	EXCEPTION WHEN unique_violation THEN
-		RAISE EXCEPTION 'Error: theme already exists';
+		RAISE EXCEPTION 'theme already exists';
 	WHEN foreign_key_violation THEN
-		RAISE EXCEPTION 'Error: invalid creator login';
+		RAISE EXCEPTION 'invalid creator login';
 	WHEN OTHERS THEN
-		RAISE EXCEPTION 'Error: system error';
+		RAISE EXCEPTION 'system error';
 
 END;
 $$
@@ -79,13 +79,13 @@ DECLARE
 BEGIN
 	SELECT count(*) INTO n from chat_room WHERE id_chatroom=id_chatroom_ AND creator=creator_;
 	IF n < 1 THEN
-		RAISE EXCEPTION 'Error: this action can only be performed by the chatroom creator';
+		RAISE EXCEPTION 'this action can only be performed by the chatroom creator';
 	END IF;
 	UPDATE chat_room SET theme=theme_, closed=closed_ WHERE id_chatroom=id_chatroom_;
 	EXCEPTION WHEN unique_violation THEN
-		RAISE EXCEPTION 'Error: theme already exists';
+		RAISE EXCEPTION 'theme already exists';
 	WHEN foreign_key_violation THEN
-		RAISE EXCEPTION 'Error: invalid creator login';
+		RAISE EXCEPTION 'invalid creator login';
 
 END;
 $$
@@ -111,7 +111,7 @@ BEGIN
 	END IF;
 		
 	EXCEPTION WHEN foreign_key_violation THEN
-		RAISE EXCEPTION 'Error: invalid creator login or chatroom id';
+		RAISE EXCEPTION 'invalid creator login or chatroom id';
 
 END;
 $$
@@ -163,13 +163,50 @@ DECLARE
 BEGIN
 	SELECT count(*) INTO tmp FROM message m, post p WHERE id_chatroom=chatroom_id AND m.id_message=p.id_message;
 	IF tmp > 0 THEN
-		-- tmp:=0;
-		-- SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
-		-- IF tmp <= 0 THEN
 		RETURN true;
-		-- END IF;
 	END IF;
 	RETURN false;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+--INC_RATE()
+CREATE OR REPLACE FUNCTION inc_rate(chatroom_id numeric, rate_ char)
+RETURNS VOID AS
+$$
+BEGIN
+	IF upper(rate_) = 'Y' THEN
+		UPDATE chatroom SET ratesY=(ratesY+1) WHERE id_chatroom=chatroom_id;
+	ELSE IF upper(rate_) = 'M' THEN
+			UPDATE chatroom SET ratesM=(ratesM+1) WHERE id_chatroom=chatroom_id;
+	ELSE IF upper(rate_) = 'N' THEN
+				UPDATE chatroom SET ratesN=(ratesN+1) WHERE id_chatroom=chatroom_id;
+	ELSE
+		RAISE EXCEPTION 'Invalid rate!';
+	END IF;
+	END IF;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+
+--DEC_RATE()
+CREATE OR REPLACE FUNCTION dec_rate(chatroom_id numeric, rate_ char)
+RETURNS VOID AS
+$$
+BEGIN
+	IF upper(rate_) = 'Y' THEN
+		UPDATE chatroom SET ratesY=(ratesY-1) WHERE id_chatroom=chatroom_id;
+	ELSE IF upper(rate_) = 'M' THEN
+		UPDATE chatroom SET ratesM=(ratesM-1) WHERE id_chatroom=chatroom_id;
+	ELSE IF upper(rate_) = 'N' THEN
+		UPDATE chatroom SET ratesN=(ratesN-1) WHERE id_chatroom=chatroom_id;
+	ELSE
+		RAISE EXCEPTION 'Invalid rate!';
+	END IF;
+	END IF;
+	END IF;
 END;
 $$
 LANGUAGE plpgsql;
@@ -182,15 +219,24 @@ $$
 DECLARE
 	can boolean:=false;
 	tmp integer:=0;
+	r char;
 BEGIN
 	IF rate_ IS NULL THEN
-		DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
+		SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+		IF tmp > 0 THEN
+			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
+			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
+			PERFORM dec_rate(chatroom_id,r);
+		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
 		IF can = true THEN
+			PERFORM inc_rate(chatroom_id, rate_);
 			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
 			IF tmp > 0 THEN
+				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
 				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user"=username;
+				PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
 			END IF;
@@ -201,3 +247,21 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+
+-- GET_CHATROOM_THEME()
+CREATE OR REPLACE FUNCTION get_chatroom_theme(id integer)
+RETURNS varchar AS
+$$
+DECLARE theme_ varchar;
+BEGIN
+	SELECT theme INTO theme_ FROM chat_room WHERE id_chatroom = id;
+	IF theme_ IS NOT NULL THEN
+		RETURN theme_;
+	ELSE
+		RAISE EXCEPTION 'Invalid chatroom';
+	END IF;		
+END;
+$$
+LANGUAGE plpgsql;
+

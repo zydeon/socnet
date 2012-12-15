@@ -1,4 +1,9 @@
 <%@ page import="dbconnect.Database" %>
+<%
+   String msg = request.getParameter("msg");
+   if(msg!=null)
+   out.println( "<span style='color:red'>*"+msg+"</span>" );
+%>
 
 <html>
 <head>
@@ -55,13 +60,9 @@
 </head>
 <body>
 
-	<% String id_chatroom = request.getParameter("id"); %>
-	<% if(id_chatroom==null) { %>
-		<p><- Select a chatroom </p>
-	<%} else {%>
-		<% String theme = Database.getChatRoomTheme(id_chatroom); %>
-		<% java.sql.ResultSet posts = Database.getPosts( id_chatroom ); %>
-
+		<% String theme = (String) request.getAttribute("theme"); %>
+		<% java.sql.ResultSet posts = (java.sql.ResultSet) request.getAttribute("posts"); %>
+		
 		<h1><%=theme%></h1>
 
 		<script type="text/javascript"> newPost(); </script>
@@ -82,8 +83,8 @@
 													   "<%=id%>",
 													   "<%=file_path%>");
 			</script>
-		<% } %>
-	<% } %>
+		<% } %>		
+		
 
 </body>
 </html> 

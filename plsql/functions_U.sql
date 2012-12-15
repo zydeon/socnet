@@ -237,10 +237,3 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-
--- view table USER_INFO
--- CREATE TABLE user_info AS 
--- SELECT DISTINCT ON (login) login, u.name, birthdate, email, gender_male, address, public, disabled, u.id_city, ci.name city_name, u.id_country, co.name country_name 
--- FROM "user" u, city ci, country co 
--- WHERE (u.id_city IS NULL OR u.id_city=ci.id_city) 
---     AND (u.id_country IS NULL OR u.id_country=co.id_country);
