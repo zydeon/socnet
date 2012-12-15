@@ -22,9 +22,14 @@ public class NewPostSv extends HttpServlet {
 			file.write( currentPath + filePath );
 		}
 
-		Database.addPost( id_chatroom, src, text, null, filePath, 0);
+		try{
+			Database.addPost( id_chatroom, src, text, null, filePath, 0);
+			response.sendRedirect("chat?id="+id_chatroom);
+		}
+		catch(SQLException e){
+			response.sendRedirect("chat.jsp?msg="+e.getMessage());
+		}
 
-		response.sendRedirect("chat?id="+id_chatroom);
 	}	
 
 

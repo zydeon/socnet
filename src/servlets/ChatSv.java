@@ -13,13 +13,19 @@ public class ChatSv extends HttpServlet{
 		if(id_chatroom != null){
 			try{
 				String theme = Database.getChatroomTheme(id_chatroom);
-				java.sql.ResultSet posts = Database.getPosts(id_chatroom);
-				request.setAttribute("theme", theme);
-				request.setAttribute("posts", posts);
-				request.setAttribute("id_chatroom", id_chatroom);
 
-				RequestDispatcher dispatcher = request.getRequestDispatcher("chat.jsp");
-				dispatcher.forward(request, response);
+				try{
+					java.sql.ResultSet posts = Database.getPosts(id_chatroom);
+					request.setAttribute("theme", theme);
+					request.setAttribute("posts", posts);
+					request.setAttribute("id_chatroom", id_chatroom);
+
+					RequestDispatcher dispatcher = request.getRequestDispatcher("chat.jsp");
+					dispatcher.forward(request, response);
+				}
+				catch(SQLException e){
+					response.sendRedirect("chat.jsp?msg="+e.getMessage());
+				}
 			}
 			catch(SQLException e){
 				System.out.println("INVALIDE CHAT ROOM");	

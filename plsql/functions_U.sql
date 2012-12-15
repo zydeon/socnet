@@ -217,23 +217,74 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- -- SEARCH_USER()
+-- CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+-- RETURNS SETOF user_info AS $$
+-- DECLARE
+-- 	r RECORD;
+-- BEGIN
+-- 	RETURN QUERY SELECT * FROM user_info
+-- 					WHERE disabled=false
+-- 						AND (public=public_ OR public_ IS NULL)
+-- 						AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
+-- 						AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
+-- 						AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
+-- 						AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
+-- 						AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
+-- 						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
+-- 						AND (birthdate=birthdate_ OR birthdate_ IS NULL)
+-- 						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
+
 -- SEARCH_USER()
-CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, age_ integer, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
 RETURNS SETOF user_info AS $$
 DECLARE
-	r RECORD;
+       r RECORD;
 BEGIN
-	RETURN QUERY SELECT * FROM user_info
-					WHERE disabled=false
-						AND (public=public_ OR public_ IS NULL)
-						AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
-						AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
-						AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
-						AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
-						AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
-						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
-						AND (birthdate=birthdate_ OR birthdate_ IS NULL)
-						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
+       RETURN QUERY SELECT * FROM user_info
+                                       WHERE disabled=false
+                                               AND (public=public_ OR public_ IS NULL)
+                                               AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
+                                               AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
+                                               AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
+                                               AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
+                                               AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
+                                               AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
+                                               AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
+                                               AND (gender_male=gender_male_ OR gender_male_ IS NULL);
 END;
 $$
 LANGUAGE plpgsql;
+
+
+ -- GET_USERS_PREMISSIONS()
+CREATE OR REPLACE FUNCTION get_users_permissions(chatroom_id integer)
+RETURNS TABLE(user_login varchar, read bool, write bool) AS $$
+DECLARE
+       r RECORD;
+       n integer;
+BEGIN
+       FOR r IN SELECT * FROM "user"
+       LOOP
+               user_login:=r.login;
+               read:=true;
+               write:=true;
+               n:=0;
+               SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE r.login AND id_chatroom=chatroom_id;
+               IF n > 0 THEN
+                       write:=false;
+                       SELECT NOT res.read INTO read FROM restrictions res WHERE "user" LIKE r.login AND id_chatroom=chatroom_id;
+               END IF;
+               RETURN NEXT;
+       END LOOP;
+       RETURN;
+       EXCEPTION WHEN OTHERS THEN
+               RAISE EXCEPTION 'system error';
+END;
+$$
+LANGUAGE plpgsql;
+
+
