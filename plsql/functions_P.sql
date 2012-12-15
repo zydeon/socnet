@@ -99,7 +99,6 @@ $$
 LANGUAGE plpgsql;
 
 --GET_ACTIVITY()
-
 CREATE OR REPLACE FUNCTION get_activity("user" varchar)
 RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar, "read" boolean) 
 AS $$
