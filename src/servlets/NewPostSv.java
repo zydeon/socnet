@@ -1,19 +1,40 @@
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.servlet.annotation.MultipartConfig;
 import java.sql.*;
-import java.util.Date;
 import dbconnect.Database;
 
+
+@MultipartConfig()
 public class NewPostSv extends HttpServlet {
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-		// String theme = request.getParameter("new_chatroom_theme");
-		// Database.addChatRoom(theme, (String) request.getSession().getAttribute("user")  );
-		// response.sendRedirect("index.jsp");
-	}
-
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		String text = request.getParameter("text");
+		String src  = (String)request.getSession().getAttribute("user");
+		Integer id_chatroom = Integer.parseInt(request.getParameter("id_chatroom"));
+		Part file = request.getPart("attach");
+		String filePath = null;
+		if( file.getSize() > 0 ){
+			String fileName = getFilename(file);
+			filePath = "attachments/"+fileName;
+			String currentPath = request.getSession().getServletContext().getRealPath("/");
+			file.write( currentPath + filePath );
+		}
+
+		Database.addPost( id_chatroom, src, text, null, filePath, 0);
+
+		response.sendRedirect("chat?id="+id_chatroom);
+	}	
+
+
+	private static String getFilename(Part part) {
+	    for (String cd : part.getHeader("content-disposition").split(";")) {
+	        if (cd.trim().startsWith("filename")) {
+	            String filename = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+	            return filename.substring(filename.lastIndexOf('/') + 1).substring(filename.lastIndexOf('\\') + 1); // MSIE fix.
+	        }
+	    }
+	    return null;
 	}
 }

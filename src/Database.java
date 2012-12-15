@@ -384,6 +384,32 @@ public class Database{
 		return rs;
 	}
 
+	public static void addPost(Integer id_chatroom, String source, String text, Integer parent, String filePath, Integer rlevel){
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT add_post(?,?,?,?,?,?);");
+				if(id_chatroom != null) st.setInt(1, id_chatroom);
+				else 					st.setNull(1, java.sql.Types.INTEGER);				
+
+				st.setString(2, source);
+				st.setString(3, text);
+
+				if(parent != null) st.setInt(4, parent);
+				else 			   st.setNull(4, java.sql.Types.INTEGER);								
+
+				st.setString(5, filePath);
+
+				if(rlevel != null) st.setInt(6, rlevel);
+				else 			   st.setNull(6, java.sql.Types.INTEGER);				
+
+				st.execute();
+			}
+		}catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+	}
+
 	public static ResultSet searchChatrooms(String creator, String theme){
 		ResultSet rs = null;
 		try{
