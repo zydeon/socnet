@@ -10,12 +10,3 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-
--- CREATE OR REPLACE FUNCTION delete_pm()
--- RETURNS trigger AS $$
--- BEGIN
--- 	DELETE FROM message WHERE id_message = OLD.id_message;
--- 	RETURN OLD;
--- END;
--- $$
--- LANGUAGE plpgsql;

@@ -129,10 +129,8 @@ BEGIN
 		DELETE FROM message WHERE id_message=id;
 	END IF;
 	RETURN NOT read_;
-
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
-	RETURN;
 END;
 $$
 LANGUAGE plpgsql;
