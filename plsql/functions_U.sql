@@ -209,6 +209,13 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- DELETE_ACTIVITY()
+CREATE OR REPLACE FUNCTION delete_activity(userlogin varchar)
+RETURNS VOID AS $$
+
+END;
+$$
+LANGUAGE plpgsql;
 
 -- SEARCH_USER()
 CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
@@ -217,16 +224,16 @@ DECLARE
 	r RECORD;
 BEGIN
 	RETURN QUERY SELECT * FROM user_info
-									WHERE disabled=false
-										AND (public=public_ OR public_ IS NULL)
-										AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
-										AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
-										AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
-										AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
-										AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
-										AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
-										AND (birthdate=birthdate_ OR birthdate_ IS NULL)
-										AND (gender_male=gender_male_ OR gender_male_ IS NULL);
+					WHERE disabled=false
+						AND (public=public_ OR public_ IS NULL)
+						AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
+						AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
+						AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
+						AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
+						AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
+						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
+						AND (birthdate=birthdate_ OR birthdate_ IS NULL)
+						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
 END;
 $$
 LANGUAGE plpgsql;
