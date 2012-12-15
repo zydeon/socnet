@@ -67,8 +67,7 @@ if(msg!=null)
 		<h4><%=theme%></h4>
 
 		<script type="text/javascript"> newPost(); </script>
-
-		<% while( posts.next() ) { %>
+		<% while(posts.next()) { %>
 		<% String from      = posts.getString("from"); %>
 		<% String text      = posts.getString("text"); %>
 		<% String sent_date = posts.getString("sent_date"); %>

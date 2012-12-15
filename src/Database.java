@@ -191,6 +191,45 @@ public class Database{
 
 		return rs;
 	}
+    public static ResultSet getOutbox(String username) throws SQLException{
+		ResultSet rs = null;
+
+		try{
+		    Connection con = getConnection();
+		    if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_outbox(?);");
+				st.setString(1, username);
+				rs = st.executeQuery();
+				putConnection(con);
+		    }
+		}
+		catch( java.sql.SQLException e){
+		    System.out.println(e);
+		}
+
+		return rs;
+	}
+
+    public static ResultSet getHistory(String user1, String user2) throws SQLException{
+		ResultSet rs = null;
+
+		try{
+		    Connection con = getConnection();
+		    if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_history(?,?);");
+				st.setString(1, user1);
+				st.setString(2, user2);
+				
+				rs = st.executeQuery();
+				putConnection(con);
+		    }
+		}
+		catch( java.sql.SQLException e){
+		    System.out.println(e);
+		}
+
+		return rs;
+	}
 
 	public static ResultSet getPosts(String id_chatroom){
 		ResultSet rs = null;
