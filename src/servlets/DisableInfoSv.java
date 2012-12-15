@@ -10,7 +10,12 @@ public class DisableInfoSv extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		String user_login = (String) request.getSession().getAttribute("user");
 
-		Database.deleteInfo(user_login);
-		response.sendRedirect("");
+		try{
+			Database.deleteInfo(user_login);
+			response.sendRedirect("");
+		}
+		catch(SQLException e){
+			response.sendRedirect("edit_profile.jsp?msg="+e.getMessage());
+		}
 	}
 }

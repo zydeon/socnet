@@ -362,7 +362,6 @@ public class Database{
 			if(con!=null){
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_info(?)");
 				st.setString(1, user);
-
 				rs = st.executeQuery();
 			}       
 		}catch( java.sql.SQLException e){
@@ -428,15 +427,22 @@ public class Database{
 				st.setString(1, user);
 				st.setString(2, pass);
 				st.setString(3, city_name);
-				st.setInt(4, id_country);
-				st.setString(5, name);
-				st.setObject(6, birthdate);
-				st.setString(7, email);
-				st.setBoolean(8, gender_male);
-				st.setString(9, address);
-				st.setBoolean(10, public_);
+				if(id_country != null) st.setInt(4, id_country);
+				else 			st.setNull(4, java.sql.Types.INTEGER);
 
-				st.executeUpdate();
+				st.setString(5, name);
+				st.setString(6, birthdate);
+				st.setString(7, email);
+
+				if(gender_male != null) st.setBoolean(8, gender_male);
+				else 			st.setNull(8, java.sql.Types.BOOLEAN);
+
+				st.setString(9, address);
+
+				if(public_ != null) st.setBoolean(10, public_);
+				else 			st.setNull(10, java.sql.Types.BOOLEAN);				
+
+				st.execute();
 			}       
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
@@ -458,6 +464,16 @@ public class Database{
 	}
 
 	public static ResultSet searchUser(String user, String city_name, String country_name , String name , Integer age, String email , Boolean gender_male , String address, Boolean public_){
+		System.out.println("user="+user);
+		System.out.println("city_name="+city_name);
+		System.out.println("country_name="+country_name);
+		System.out.println("name="+name);
+		System.out.println("age="+age);
+		System.out.println("email="+email);
+		System.out.println("gender_male="+gender_male);
+		System.out.println("address="+address);
+		System.out.println("public_="+public_);
+
 		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
@@ -526,19 +542,13 @@ public class Database{
 		return rs;
 	}	
 
-	public static void deleteInfo(String user){
-		// ResultSet rs = null;
-		// try{
-		// 	Connection con = getConnection();
-		// 	if(con!=null){
-		// 		PreparedStatement st = con.prepareStatement("SELECT _user(?,?);");
-		// 		st.setString(1, user);
-		// 		st.setBoolean(2, disabled);
-		// 		st.executeUpdate();
-		// 	}
-		// }catch( java.sql.SQLException e){
-		// 	System.out.println(e);
-		// }
+	public static void deleteInfo(String user)throws SQLException{
+		Connection con = getConnection();
+		if(con!=null){
+			PreparedStatement st = con.prepareStatement("SELECT delete_activity(?);");
+			st.setString(1, user);
+			st.execute();
+		}
 	}
 
     public static void addRate(String user, int chatroom,String rate) throws java.sql.SQLException{

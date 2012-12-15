@@ -21,7 +21,6 @@ public class RestrictUserSv extends HttpServlet {
 			restriction = false;
 
 		Database.userRestrict(user_login, id_chatroom, restriction);
-System.out.println("restriction="+restriction);
 		response.sendRedirect("edit_chatroom.jsp?id="+id_chatroom);
 
 	}	

@@ -132,8 +132,8 @@ BEGIN
 	FOR r IN SELECT u.*, co.name country_name, ci.name city_name
 		FROM "user" u, country co, city ci
 		WHERE u.login LIKE user_login AND
-			  u.id_city = ci.id_city AND
-			  u.id_country = co.id_country
+			  (u.id_city IS NULL OR (u.id_city = ci.id_city)) AND
+			  (u.id_country IS NULL OR (u.id_country = co.id_country))
 	LOOP
 		login := r.login;
 		id_city := r.id_city;
@@ -176,7 +176,7 @@ $$
 LANGUAGE plpgsql;
 
 -- UPDATE_PROFILE()
-CREATE OR REPLACE FUNCTION update_profile(login_ varchar,pass_ varchar, city_name_ varchar, id_country_ integer, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+CREATE OR REPLACE FUNCTION update_profile(login_ varchar,pass_ varchar, city_name_ varchar, id_country_ integer, name_ varchar, birthdate_ varchar, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
 RETURNS VOID AS
 $$
 DECLARE
@@ -190,7 +190,8 @@ BEGIN
 					  email=email_,
 					  gender_male=gender_male_,
 					  address=address_,
-					  public=public_
+					  public=public_,
+					  birthdate = birthdate_
 		WHERE login LIKE login_;
 
 	IF city_name_ IS NOT NULL AND city_name_ NOT LIKE '' THEN
@@ -201,8 +202,8 @@ BEGIN
 	IF pass_ IS NOT NULL AND pass_ NOT LIKE '' THEN
 		PERFORM update_password(login_,pass_);
 	END IF;
-	EXCEPTION WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+	-- EXCEPTION WHEN OTHERS THEN
+	-- 	RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -260,8 +261,8 @@ BEGIN
 
 	PERFORM update_profile(userlogin, null, null, null, null, null, null, null, null, false);
 
-	EXCEPTION WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+	-- EXCEPTION WHEN OTHERS THEN
+	-- 	RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -288,7 +289,7 @@ LANGUAGE plpgsql;
 -- LANGUAGE plpgsql;
 
 -- SEARCH_USER()
-CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, age_ integer, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+CREATE OR REPLACE FUNCTION search_user_(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, age_ integer, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
 RETURNS SETOF user_info AS $$
 DECLARE
        r RECORD;
@@ -304,8 +305,8 @@ BEGIN
 						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
 						AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
 						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
-	EXCEPTION WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+	-- EXCEPTION WHEN OTHERS THEN
+	-- 	RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;

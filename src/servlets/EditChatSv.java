@@ -19,6 +19,5 @@ public class EditChatSv extends HttpServlet {
 		catch(SQLException e){
 			response.sendRedirect("edit_chatroom.jsp?msg="+e.getMessage()+"&id="+id_chatroom);
 		}
-
 	}	
 }
