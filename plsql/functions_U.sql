@@ -293,4 +293,29 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- EXTRACT(year from AGE(NOW(), '1985-08-21'))
+-- GET_USERS_PREMISSIONS()
+CREATE OR REPLACE FUNCTION get_users_premissions(chatroom_id integer)
+RETURNS TABLE(user_login varchar, read bool, write bool) AS $$
+DECLARE
+	r RECORD;
+	n integer;
+BEGIN
+	FOR r IN SELECT * FROM "user"
+	LOOP
+		user_login:=r.login;
+		read:=true;
+		write:=true;
+		n:=0;
+		SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE r.login AND id_chatroom=chatroom_id;
+		IF n > 0 THEN
+			write:=false;
+			SELECT res.read INTO read FROM restrictions res WHERE "user" LIKE r.login AND id_chatroom=chatroom_id;
+		END IF;
+		RETURN NEXT;
+	END LOOP;
+	RETURN;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+END;
+$$
+LANGUAGE plpgsql;

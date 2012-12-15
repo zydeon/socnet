@@ -98,10 +98,9 @@ END;
 $$
 LANGUAGE plpgsql;
 
---GET_ACTIVITY()
-
 CREATE OR REPLACE FUNCTION get_outbox("user" varchar)
 RETURNS TABLE (id_message_ numeric, "from" varchar, text varchar,"read" boolean,"to" varchar,file_path varchar,sent_date timestamp) AS $$
+
 DECLARE	
 BEGIN			
 	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read",p."to",m.attach_path,m.sent_date
