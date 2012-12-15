@@ -63,6 +63,17 @@
         <url-pattern>/enable</url-pattern>
     </servlet-mapping> 
 
+    <!-- Edit chat -->
+    <servlet>
+        <servlet-name>EditChat</servlet-name>
+        <servlet-class>EditChatSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>EditChat</servlet-name>
+        <url-pattern>/editChat</url-pattern>
+    </servlet-mapping>     
+
     <!-- Search User -->
     <servlet>
         <servlet-name>SearchUser</servlet-name>
@@ -106,6 +117,17 @@
         <servlet-name>Logout</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>  
+
+    <!-- RESTRICTIONS -->
+    <servlet>
+        <servlet-name>RestrictUser</servlet-name>
+        <servlet-class>RestrictUserSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RestrictUser</servlet-name>
+        <url-pattern>/restrictUser</url-pattern>
+    </servlet-mapping>      
 
     <!-- CHAT -->
     <servlet>

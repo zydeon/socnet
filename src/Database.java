@@ -174,20 +174,39 @@ public class Database{
 		return rs;
 	}
 
-    public static ResultSet getInbox(String username) throws SQLException{
+	public static ResultSet getChatroomInfo(String id_chatroom){
 		ResultSet rs = null;
-
 		try{
-		    Connection con = getConnection();
-		    if(con!=null){
-				PreparedStatement st = con.prepareStatement("SELECT * FROM get_inbox(?);");
-				st.setString(1, username);
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_chatroom_info(?);");
+				st.setInt(1, Integer.parseInt(id_chatroom));
+
 				rs = st.executeQuery();
 				putConnection(con);
-		    }
+			}
 		}
 		catch( java.sql.SQLException e){
-		    System.out.println(e);
+			System.out.println(e);
+		}
+
+		return rs;
+	}	
+
+	public static ResultSet getUserPermissions(String id_chatroom){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_users_permissions(?);");
+				st.setInt(1, Integer.parseInt(id_chatroom));
+
+				rs = st.executeQuery();
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
 		}
 
 		return rs;
@@ -232,19 +251,89 @@ public class Database{
 		return rs;
 	}
 
-	public static ResultSet getPosts(String id_chatroom){
+	public static void userRestrict(String login, Integer id_chatroom, Boolean read){
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT user_restriction(?,?,?);");
+				st.setString(1, login);
+				if(id_chatroom != null) st.setInt(2, id_chatroom);
+				else 			 		st.setNull(2, java.sql.Types.INTEGER);
+				if(read != null) st.setBoolean(3, read);
+				else 			 st.setNull(3, java.sql.Types.BOOLEAN);
+
+				st.executeQuery();
+				putConnection(con);
+			}
+		}
+		catch( java.sql.SQLException e){
+			System.out.println(e);
+		}
+	}			
+
+	public static ResultSet getUserChatrooms(String user_login){
 		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
-				PreparedStatement st = con.prepareStatement("SELECT * FROM get_posts(?,NULL)");
-				st.setInt(1, Integer.parseInt(id_chatroom) );
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_chatrooms(?);");
+				st.setString(1, user_login);
 				rs = st.executeQuery();
 				putConnection(con);
 			}
 		}
 		catch( java.sql.SQLException e){
 			System.out.println(e);
+		}
+
+		return rs;
+	}
+
+	public static ResultSet editChatroom(Integer id_chatroom, String creator, String theme, Boolean closed) throws SQLException{
+		ResultSet rs = null;
+		Connection con = getConnection();
+		if(con!=null){
+			PreparedStatement st = con.prepareStatement("SELECT update_chatroom(?,?,?,?);");
+			if(id_chatroom != null) st.setInt(1, id_chatroom);
+			else 			st.setNull(1, java.sql.Types.INTEGER);
+			st.setString(2, creator);
+			st.setString(3, theme);
+			if(closed != null) st.setBoolean(4, closed);
+			else 			st.setNull(4, java.sql.Types.BOOLEAN);
+
+			rs = st.executeQuery();
+			putConnection(con);
+		}
+		return rs;
+	}
+
+    public static ResultSet getInbox(String username) throws SQLException{
+		ResultSet rs = null;
+
+		try{
+		    Connection con = getConnection();
+		    if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM get_inbox(?);");
+				st.setString(1, username);
+				rs = st.executeQuery();
+				putConnection(con);
+		    }
+		}
+		catch( java.sql.SQLException e){
+		    System.out.println(e);
+		}
+
+		return rs;
+	}
+
+	public static ResultSet getPosts(String id_chatroom) throws SQLException{
+		ResultSet rs = null;
+		Connection con = getConnection();
+		if(con!=null){
+			PreparedStatement st = con.prepareStatement("SELECT * FROM get_posts(?,NULL)");
+			st.setInt(1, Integer.parseInt(id_chatroom) );
+			rs = st.executeQuery();
+			putConnection(con);
 		}
 
 		return rs;
@@ -398,30 +487,26 @@ public class Database{
 		return rs;
 	}
 
-	public static void addPost(Integer id_chatroom, String source, String text, Integer parent, String filePath, Integer rlevel){
-		try{
-			Connection con = getConnection();
-			if(con!=null){
-				PreparedStatement st = con.prepareStatement("SELECT add_post(?,?,?,?,?,?);");
-				if(id_chatroom != null) st.setInt(1, id_chatroom);
-				else 					st.setNull(1, java.sql.Types.INTEGER);				
+	public static void addPost(Integer id_chatroom, String source, String text, Integer parent, String filePath, Integer rlevel) throws SQLException{
+		Connection con = getConnection();
+		if(con!=null){
+			PreparedStatement st = con.prepareStatement("SELECT add_post(?,?,?,?,?,?);");
+			if(id_chatroom != null) st.setInt(1, id_chatroom);
+			else 					st.setNull(1, java.sql.Types.INTEGER);				
 
-				st.setString(2, source);
-				st.setString(3, text);
+			st.setString(2, source);
+			st.setString(3, text);
 
-				if(parent != null) st.setInt(4, parent);
-				else 			   st.setNull(4, java.sql.Types.INTEGER);								
+			if(parent != null) st.setInt(4, parent);
+			else 			   st.setNull(4, java.sql.Types.INTEGER);								
 
-				st.setString(5, filePath);
+			st.setString(5, filePath);
 
-				if(rlevel != null) st.setInt(6, rlevel);
-				else 			   st.setNull(6, java.sql.Types.INTEGER);				
+			if(rlevel != null) st.setInt(6, rlevel);
+			else 			   st.setNull(6, java.sql.Types.INTEGER);				
 
-				st.execute();
-			}
-		}catch( java.sql.SQLException e){
-			System.out.println(e);
-		}		
+			st.execute();
+		}	
 	}
 
 	public static ResultSet searchChatrooms(String creator, String theme){
