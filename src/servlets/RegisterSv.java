@@ -9,8 +9,6 @@ public class RegisterSv extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		PrintWriter out = response.getWriter();
-
 		String user      = request.getParameter("user");
 		String pass      = request.getParameter("password");
 		String name = request.getParameter("name");

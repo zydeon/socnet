@@ -63,6 +63,28 @@
         <url-pattern>/enable</url-pattern>
     </servlet-mapping> 
 
+    <!-- Search User -->
+    <servlet>
+        <servlet-name>SearchUser</servlet-name>
+        <servlet-class>SearchUserSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SearchUser</servlet-name>
+        <url-pattern>/searchUser</url-pattern>
+    </servlet-mapping> 
+
+    <!-- Search Chatrooms -->
+    <servlet>
+        <servlet-name>SearchChats</servlet-name>
+        <servlet-class>SearchChatsSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SearchChats</servlet-name>
+        <url-pattern>/searchChats</url-pattern>
+    </servlet-mapping>         
+
     <!-- Delete info -->
     <servlet>
         <servlet-name>DeleteInfo</servlet-name>
