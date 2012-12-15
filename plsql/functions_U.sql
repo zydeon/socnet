@@ -212,13 +212,42 @@ LANGUAGE plpgsql;
 -- DELETE_ACTIVITY()
 CREATE OR REPLACE FUNCTION delete_activity(userlogin varchar)
 RETURNS VOID AS $$
+DECLARE
+	r RECORD;
+	tmp integer;
+BEGIN
+	DELETE FROM message WHERE "from" LIKE userlogin AND id_message IN (SELECT id_message FROM pm WHERE read=false);
+	
+	FOR r IN SELECT * FROM rates
+		WHERE "user" LIKE userlogin
+	LOOP
+		PERFORM rate_chatroom(userlogin, r.id_chatroom, null);
+	END LOOP;
 
+	FOR r IN SELECT * FROM post
+		WHERE id_message IN (SELECT id_message FROM message WHERE "from" LIKE userlogin)
+		ORDER BY rlevel DESC
+	LOOP
+		tmp:=0;
+		SELECT count(*) INTO tmp FROM post WHERE id_parent=r.id_message;
+		IF tmp = 0 THEN
+			DELETE FROM message WHERE id_message=r.id_message;
+		END IF;
+	END LOOP;
+
+	DELETE FROM chat_room WHERE creator LIKE userlogin AND id_chatroom NOT IN (SELECT id_chatroom FROM post);
+
+	PERFORM update_profile(userlogin, null, null, null, null, null, null, null, null, false);
 END;
 $$
 LANGUAGE plpgsql;
 
+-- FOREIGN KEY (id_message) REFERENCES message(id_message) ON UPDATE RESTRICT ON DELETE CASCADE
+-- FOREIGN KEY (id_message) REFERENCES message(id_message) ON UPDATE RESTRICT ON DELETE CASCADE
+-- FOREIGN KEY (id_chatroom) REFERENCES chat_room(id_chatroom) ON UPDATE RESTRICT ON DELETE CASCADE
+
 -- SEARCH_USER()
-CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, age_ integer, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
 RETURNS SETOF user_info AS $$
 DECLARE
 	r RECORD;
@@ -232,8 +261,10 @@ BEGIN
 						AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
 						AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
 						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
-						AND (birthdate=birthdate_ OR birthdate_ IS NULL)
+						AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
 						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
 END;
 $$
 LANGUAGE plpgsql;
+
+-- EXTRACT(year from AGE(NOW(), '1985-08-21'))

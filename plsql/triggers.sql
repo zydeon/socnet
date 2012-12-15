@@ -4,12 +4,7 @@ CREATE TRIGGER update_rlevel
 	FOR EACH ROW
 	EXECUTE PROCEDURE set_rlevel();
 
--- CREATE TRIGGER increase_num_rates
--- 	AFTER INSERT ON rates
+-- CREATE TRIGGER deleted_pm
+-- 	AFTER DELETE ON pm
 -- 	FOR EACH ROW
--- 	EXECUTE PROCEDURE inc_num_rates();
-
--- CREATE TRIGGER decrease_num_rates
--- 	AFTER DELETE ON rates
--- 	FOR EACH ROW
--- 	EXECUTE PROCEDURE dec_num_rates();
+-- 	EXECUTE PROCEDURE delete_pm();

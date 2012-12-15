@@ -222,20 +222,20 @@ DECLARE
 	r char;
 BEGIN
 	IF rate_ IS NULL THEN
-		SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+		SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 		IF tmp > 0 THEN
-			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
-			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
+			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
+			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			PERFORM dec_rate(chatroom_id,r);
 		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
 		IF can = true THEN
 			PERFORM inc_rate(chatroom_id, rate_);
-			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user"=username;
+			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			IF tmp > 0 THEN
-				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user"=username;
-				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user"=username;
+				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
+				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 				PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
@@ -247,7 +247,6 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-
 
 -- GET_CHATROOM_THEME()
 CREATE OR REPLACE FUNCTION get_chatroom_theme(id integer)
