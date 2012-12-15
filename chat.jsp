@@ -7,29 +7,29 @@ if(msg!=null)
 
 <html>
 <head>
-	<script type="text/javascript">
-	function outputPost(source, text, sentDate, replyLevel, owner, ID, filePath){
-		var rl = parseInt(replyLevel);
-		var html =  "<div class=post_div id='"+ID+"' style='position:relative;left:"+(rl*50)+"'>" +
-		"FROM "+source+" <br>"+
-		"date:"+ sentDate +"<br>"+
-		"<p>"+text+"</p>"+
-		"<button onclick=\"newReply('"+ID+"','"+(rl+1)+"')\">Reply</button>";
+    <script type="text/javascript">
+    function outputPost(source, text, sentDate, replyLevel, owner, ID, filePath){
+	var rl = parseInt(replyLevel);
+	var html =  "<div class=post_div id='"+ID+"' style='position:relative;left:"+(rl*50)+"'>" +
+	    "FROM "+source+" <br>"+
+	    "date:"+ sentDate +"<br>"+
+	    "<p>"+text+"</p>"+
+	    "<button onclick=\"newReply('"+ID+"','"+(rl+1)+"')\">Reply</button>";
 
-		if(filePath!="null"){
-			html += "<a href=\""+filePath+"\">Anexo</a>"
-		}	
+	if(filePath!="null"){
+	    html += "<a href=\""+filePath+"\">Anexo</a>"
+	}	
 
-		if(owner=="true"){
-				//html += "<button onclick=\"editPost('"+ID+"')\"> Edit </button>" +
-				html +=	"<form action='deletePost' method='post'>"+
-				"<input type='hidden' name='id' value="+ID+"> "+
-				"<input type='submit' value='Delete'>"+
-				"</form>";
-			}
-			html += "</div><br><br>";				
-			document.write(html);
-		}	
+	if(owner=="true"){
+	    //html += "<button onclick=\"editPost('"+ID+"')\"> Edit </button>" +
+	    html +=	"<form action='deletePost' method='post'>"+
+		"<input type='hidden' name='id' value="+ID+"> "+
+		"<input type='submit' value='Delete'>"+
+		"</form>";
+	}
+	html += "</div><br><br>";				
+	document.write(html);
+    }	
 		function newReply(parent, replyLvl){
 			div = document.createElement('div');
 			div.innerHTML = "<form action='newReply' method='post'>"+

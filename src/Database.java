@@ -109,14 +109,14 @@ public class Database{
 	// }
 
     public static ArrayList<String> getUserNames() throws SQLException{
-		Connection con = Database.getConnection();
-		ArrayList<String> names = new ArrayList<String>();
-		if(con != null){
-			PreparedStatement st = con.prepareStatement("SELECT get_all_users()");
-			ResultSet rs = st.executeQuery();
-		    try{
-				while(rs.next())
-				    names.add(rs.getString(1));
+	Connection con = Database.getConnection();
+	ArrayList<String> names = new ArrayList<String>();
+	if(con != null){
+	    PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_names()");
+	    ResultSet rs = st.executeQuery();
+	    try{
+		while(rs.next())
+		    names.add(rs.getString(1));
 				
 				Database.putConnection(con);
 		    }catch(SQLException e){
