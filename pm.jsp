@@ -34,23 +34,27 @@
     <h1>soc.net</h1>
     <div class="main_div">
       <h4>PM's</h4>
-      <div>
 	<hr><br>
+      <div>
 	<a href="pm?list=inbox"><button>Inbox</button></a>
 	<a href="pm?list=outbox"><button>Outbox</button></a>
 	<button onclick="hist_func()">History</button>
 	<input type="text" id="hist_link">
       </div>
-      <div id="sendPM" style="float:left;">
+      <hr><br>
+      <div id="sendPM" class="reg_div" style="float:left;">
 	Choose User:
-	<form action="newPM" method="post">
-	  <select name="dest" style="float:left">
+	<form action="newPM" method="post" enctype="multipart/form-data">
+	  <select name="to" style="float:left">
 	    <% for(String user : usernames) {%>
 	    <option value="<%=user%>"><%=user%></option>
 	    <% } %>
 	  </select>
-	  
+	  <br><br>
 	  <textarea name="text" placeholder="Write PM here"></textarea> <br>
+	  <input type="file" name="attach"><br>
+	  Send At:<br>
+	  <input type="text" name="time">
 	  <input type="submit" value="Send">
 	</form>
       </div>

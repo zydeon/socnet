@@ -141,6 +141,16 @@
         <url-pattern>/newPost</url-pattern>
     </servlet-mapping>          
 
+    <!-- NEW PM -->
+    <servlet>
+        <servlet-name>NewPM</servlet-name>
+        <servlet-class>NewPMSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NewPM</servlet-name>
+        <url-pattern>/newPM</url-pattern>
+    </servlet-mapping>          
 
     <!-- DATABASE -->
     <servlet>
