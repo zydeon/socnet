@@ -109,14 +109,14 @@ public class Database{
 	// }
 
     public static ArrayList<String> getUserNames() throws SQLException{
-		Connection con = Database.getConnection();
-		ArrayList<String> names = new ArrayList<String>();
-		if(con != null){
-			PreparedStatement st = con.prepareStatement("SELECT get_all_users()");
-			ResultSet rs = st.executeQuery();
-		    try{
-				while(rs.next())
-				    names.add(rs.getString(1));
+	Connection con = Database.getConnection();
+	ArrayList<String> names = new ArrayList<String>();
+	if(con != null){
+	    PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_names()");
+	    ResultSet rs = st.executeQuery();
+	    try{
+		while(rs.next())
+		    names.add(rs.getString(1));
 				
 				Database.putConnection(con);
 		    }catch(SQLException e){
@@ -302,7 +302,6 @@ public class Database{
 	}
 
 	public static void toggleUser(String user, Boolean disabled){
-		ResultSet rs = null;
 		try{
 			Connection con = getConnection();
 			if(con!=null){
@@ -315,6 +314,54 @@ public class Database{
 			System.out.println(e);
 		}
 	}
+
+	public static ResultSet searchUser(String user, String city_name, String country_name , String name , Integer age, String email , Boolean gender_male , String address, Boolean public_){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM search_user(?,?,?,?,?,?,?,?,?);");
+				st.setString(1, user);
+				st.setString(2, city_name);
+				st.setString(3, country_name);
+				st.setString(4, name);
+				if(age != null) st.setInt(5, age);
+				else 			st.setNull(5, java.sql.Types.INTEGER);
+				st.setString(6, email);
+
+				if(gender_male != null) st.setBoolean(7, gender_male);
+				else 					st.setNull(7, java.sql.Types.BOOLEAN);
+
+				st.setString(8, address);
+
+				if(public_ != null) st.setBoolean(9, public_);
+				else 			st.setNull(9, java.sql.Types.BOOLEAN);				
+
+				rs = st.executeQuery();
+			}
+		}catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+		return rs;
+	}
+
+	public static ResultSet searchChatrooms(String creator, String theme){
+		ResultSet rs = null;
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st = con.prepareStatement("SELECT * FROM search_chatrooms(?,?);");
+				st.setString(1, creator);
+				st.setString(2, theme);				
+
+				rs = st.executeQuery();
+			}
+		}catch( java.sql.SQLException e){
+			System.out.println(e);
+		}		
+		return rs;
+	}	
+
 	public static void deleteInfo(String user){
 		// ResultSet rs = null;
 		// try{
