@@ -28,48 +28,46 @@
       
     </script>
   </head>
-    <body>
+  <body>
     
-
-    <h1>PMS</h1>
     
-    <div id="sendPM" style="float:left;">
-      Choose User:
-      <form action="newPM" method="post">
-	<select name="dest" style="float:left">
-	  <% for(String user : usernames) {%>
-	  <option value="<%=user%>"><%=user%></option>
-	  <% } %>
-	</select>
-	
-	<textarea name="text" placeholder="Write PM here"></textarea> <br>
-	<input type="submit" value="Send">
-      </form>
-    </div>
+    <h1>soc.net</h1>
+    <div class="main_div">
+      <h4>PM's</h4>
+      <div id="sendPM" style="float:left;">
+	Choose User:
+	<form action="newPM" method="post">
+	  <select name="dest" style="float:left">
+	    <% for(String user : usernames) {%>
+	    <option value="<%=user%>"><%=user%></option>
+	    <% } %>
+	  </select>
+	  
+	  <textarea name="text" placeholder="Write PM here"></textarea> <br>
+	  <input type="submit" value="Send">
+	</form>
+      </div>
 
-    <div id="showPMs" style="float:left;">
-      <!-- remover esta linha (meter num style.css a parte digo eu) -->
-      <style type="text/css">
-	div { border: 1px solid white; }
-      </style>
-      <% while(pms.next()) { %>
-		<% String from      = pms.getString("from"); %>
-		<% String to        = pms.getString("to"); %>
-		<% String text      = pms.getString("text"); %>
-		<% String sent_date = pms.getString("sent_date"); %>
-		<% Integer id       = pms.getInt("id_message"); %>
-		<% String file_path = pms.getString("file_path"); %>
+      <div id="showPMs" style="float:left;">
+	<!-- remover esta linha (meter num style.css a parte digo eu) -->
+	<% while(pms.next()) { %>
+	<% String from      = pms.getString("from"); %>
+	<% String to        = pms.getString("to"); %>
+	<% String text      = pms.getString("text"); %>
+	<% String sent_date = pms.getString("sent_date"); %>
+	<% Integer id       = pms.getInt("id_message"); %>
+	<% String file_path = pms.getString("file_path"); %>
 	
-      <script type="text/javascript"> outputPm(
-	"<%=from%>",
-	"<%=to%>",
-	"<%=text%>",
-	"<%=sent_date%>",
-	"<%=id%>",
-	"<%=file_path%>");
-      </script>	
-      <% } %>
+	<script type="text/javascript"> outputPm(
+	  "<%=from%>",
+	  "<%=to%>",
+	  "<%=text%>",
+	  "<%=sent_date%>",
+	  "<%=id%>",
+	  "<%=file_path%>");
+	</script>	
+	<% } %>
+      </div>
     </div>
-
   </body>
 </html>
