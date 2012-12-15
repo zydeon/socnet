@@ -8,6 +8,8 @@ BEGIN
 		RETURN true;
 	END IF;
 	RETURN false;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql
@@ -20,6 +22,8 @@ DECLARE
 BEGIN
 	SELECT INTO salt gen_salt('md5');
 	RETURN salt;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -31,6 +35,8 @@ DECLARE
 BEGIN
 	SELECT INTO hash crypt(pass, salt);
 	RETURN hash;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -54,6 +60,8 @@ BEGIN
 	END IF;
 
 	RETURN false;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql
@@ -76,6 +84,9 @@ BEGIN
 	END IF;
 
 	RETURN id;
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql
@@ -139,6 +150,8 @@ BEGIN
 		RETURN NEXT;
 	END LOOP;
 	RETURN;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -156,6 +169,8 @@ BEGIN
 		SELECT generate_hash(pass_, salt_) INTO hash_;
 		UPDATE "user" SET pwhash=hash_, salt=salt_ WHERE login LIKE login_;
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -186,6 +201,8 @@ BEGIN
 	IF pass_ IS NOT NULL AND pass_ NOT LIKE '' THEN
 		PERFORM update_password(login_,pass_);
 	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -196,6 +213,8 @@ RETURNS VOID AS
 $$
 BEGIN
 	UPDATE "user" SET disabled=disable WHERE login LIKE login_;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -205,6 +224,8 @@ CREATE OR REPLACE FUNCTION get_user_names()
 RETURNS TABLE (login varchar) AS $$
 BEGIN
 	RETURN QUERY SELECT u.login FROM "user" u;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -238,6 +259,9 @@ BEGIN
 	DELETE FROM chat_room WHERE creator LIKE userlogin AND id_chatroom NOT IN (SELECT id_chatroom FROM post);
 
 	PERFORM update_profile(userlogin, null, null, null, null, null, null, null, null, false);
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -263,6 +287,8 @@ BEGIN
 						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
 						AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
 						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;

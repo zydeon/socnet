@@ -18,7 +18,8 @@ BEGIN
 EXCEPTION
 	WHEN unique_violation THEN
 		RAISE EXCEPTION 'Pm failure';
-	RETURN;
+	WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -43,6 +44,8 @@ BEGIN
 EXCEPTION
 	WHEN unique_violation THEN
 		RAISE EXCEPTION 'Delayed Pm Failure';
+	WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 	RETURN;
 END;
 $$
@@ -67,6 +70,9 @@ BEGIN
 	WHERE m.id_message = p.id_message AND 
 	((m."from" LIKE user1 AND p.to LIKE user2) OR (m."from" LIKE user2 AND p.to LIKE user1)) AND
 	m.sent_date < ts;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;	
 $$
 LANGUAGE plpgsql;
@@ -84,6 +90,10 @@ BEGIN
 	RETURN QUERY SELECT m.id_message, m."from", m.text, p."read"
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND p."to" LIKE username AND m.sent_date < ts;
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;
@@ -99,6 +109,10 @@ BEGIN
 	FROM message m, pm p
 	WHERE m.id_message = p.id_message AND 
 	m."from" LIKE "user";
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;
@@ -115,6 +129,10 @@ BEGIN
 		DELETE FROM message WHERE id_message=id;
 	END IF;
 	RETURN NOT read_;
+
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+	RETURN;
 END;
 $$
 LANGUAGE plpgsql;

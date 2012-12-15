@@ -167,8 +167,8 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION search_chatrooms(creator_ varchar, theme_ varchar)
 RETURNS SETOF chat_room AS $$
 BEGIN
-	RETURN QUERY SELECT * FROM chat_room WHERE upper(theme) LIKE '%' || upper(theme_) || '%'
-											AND upper(creator) LIKE '%' || upper(creator_) || '%';
+	RETURN QUERY SELECT * FROM chat_room WHERE (upper(theme) LIKE '%' || upper(theme_) || '%' OR theme_ IS NULL)
+											AND (upper(creator) LIKE '%' || upper(creator_) || '%' OR creator_ IS NULL);
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
 END;
@@ -331,3 +331,13 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- GET_CHATROOM_INFO()
+CREATE OR REPLACE FUNCTION get_chatroom_info(id integer)
+RETURNS SETOF chat_room AS $$
+BEGIN
+	RETURN QUERY SELECT * FROM chat_room WHERE id_chatroom=id;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
+END;
+$$
+LANGUAGE plpgsql;
