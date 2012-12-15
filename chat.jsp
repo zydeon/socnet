@@ -42,13 +42,14 @@ if(msg!=null)
 			"</form>";
 			document.getElementById(parent).appendChild(div);
 		}	
-		function newPost(){
+		function newPost(id_chatroom){
 			var html = 	"<div>"+
 			"<form action='newPost' method='post' enctype='multipart/form-data'>"+
 			"<textarea name='text' rows='2' cols='30' placeholder='New post here'>"+
 			"</textarea>"+
 			"<br>"+
-			"<input type='file' name='pic' accept='image/*'>"+
+			"<input type='hidden' name='id_chatroom' value='"+id_chatroom+"'>"+
+			"<input type='file' name='attach'>"+
 			"<input type='submit' value='Submit'>"+
 			"</form>"+
 			"</div>";
@@ -63,10 +64,11 @@ if(msg!=null)
 	<body style='text-align:left;'>
 		<% String theme = (String) request.getAttribute("theme"); %>
 		<% java.sql.ResultSet posts = (java.sql.ResultSet) request.getAttribute("posts"); %>
+		<% String id_chatroom = (String) request.getAttribute("id_chatroom"); %>
 		
 		<h4><%=theme%></h4>
 
-		<script type="text/javascript"> newPost(); </script>
+		<script type="text/javascript"> newPost("<%=id_chatroom%>"); </script>
 
 		<% while( posts.next() ) { %>
 		<% String from      = posts.getString("from"); %>

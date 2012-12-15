@@ -16,6 +16,7 @@ public class ChatSv extends HttpServlet{
 				java.sql.ResultSet posts = Database.getPosts(id_chatroom);
 				request.setAttribute("theme", theme);
 				request.setAttribute("posts", posts);
+				request.setAttribute("id_chatroom", id_chatroom);
 
 				RequestDispatcher dispatcher = request.getRequestDispatcher("chat.jsp");
 				dispatcher.forward(request, response);

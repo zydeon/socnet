@@ -128,7 +128,18 @@
     <servlet-mapping>
         <servlet-name>NewChatRoom</servlet-name>
         <url-pattern>/new_chatroom</url-pattern>
-    </servlet-mapping>      
+    </servlet-mapping>
+
+    <!-- NEW POST -->
+    <servlet>
+        <servlet-name>NewPost</servlet-name>
+        <servlet-class>NewPostSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NewPost</servlet-name>
+        <url-pattern>/newPost</url-pattern>
+    </servlet-mapping>          
 
 
     <!-- DATABASE -->
