@@ -176,7 +176,7 @@ $$
 LANGUAGE plpgsql;
 
 -- UPDATE_PROFILE()
-CREATE OR REPLACE FUNCTION update_profile(login_ varchar,pass_ varchar, city_name_ varchar, id_country_ integer, name_ varchar, birthdate_ varchar, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+CREATE OR REPLACE FUNCTION update_profile(login_ varchar,pass_ varchar, city_name_ varchar, id_country_ integer, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
 RETURNS VOID AS
 $$
 DECLARE
@@ -202,8 +202,8 @@ BEGIN
 	IF pass_ IS NOT NULL AND pass_ NOT LIKE '' THEN
 		PERFORM update_password(login_,pass_);
 	END IF;
-	-- EXCEPTION WHEN OTHERS THEN
-	-- 	RAISE EXCEPTION 'system error';
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -258,38 +258,15 @@ BEGIN
 	END LOOP;
 
 	DELETE FROM chat_room WHERE creator LIKE userlogin AND id_chatroom NOT IN (SELECT id_chatroom FROM post);
-
 	PERFORM update_profile(userlogin, null, null, null, null, null, null, null, null, false);
-
-	-- EXCEPTION WHEN OTHERS THEN
-	-- 	RAISE EXCEPTION 'system error';
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
 
--- -- SEARCH_USER()
--- CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, birthdate_ date, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
--- RETURNS SETOF user_info AS $$
--- DECLARE
--- 	r RECORD;
--- BEGIN
--- 	RETURN QUERY SELECT * FROM user_info
--- 					WHERE disabled=false
--- 						AND (public=public_ OR public_ IS NULL)
--- 						AND (upper(login) LIKE '%' || upper(login_) || '%' OR login_ IS NULL)
--- 						AND (upper(city_name) LIKE '%' || upper(city_name_) || '%' OR city_name_ IS NULL)
--- 						AND (upper(country_name) LIKE '%' || upper(country_name_) || '%' OR country_name_ IS NULL)
--- 						AND (upper(name) LIKE '%' || upper(name_) || '%' OR name_ IS NULL)
--- 						AND (upper(address) LIKE '%' || upper(address_) || '%' OR address_ IS NULL)
--- 						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
--- 						AND (birthdate=birthdate_ OR birthdate_ IS NULL)
--- 						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
--- END;
--- $$
--- LANGUAGE plpgsql;
-
 -- SEARCH_USER()
-CREATE OR REPLACE FUNCTION search_user_(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, age_ integer, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
+CREATE OR REPLACE FUNCTION search_user(login_ varchar, city_name_ varchar, country_name_ varchar, name_ varchar, age_ integer, email_ varchar, gender_male_ boolean, address_ varchar, public_ boolean)
 RETURNS SETOF user_info AS $$
 DECLARE
        r RECORD;
@@ -305,8 +282,8 @@ BEGIN
 						AND (upper(email) LIKE '%' || upper(email_) || '%' OR email_ IS NULL)
 						AND (EXTRACT(year from AGE(NOW(), birthdate))=age_ OR age_ IS NULL)
 						AND (gender_male=gender_male_ OR gender_male_ IS NULL);
-	-- EXCEPTION WHEN OTHERS THEN
-	-- 	RAISE EXCEPTION 'system error';
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
