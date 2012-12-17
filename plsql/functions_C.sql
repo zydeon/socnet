@@ -349,14 +349,15 @@ BEGIN
 		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
+		PERFORM inc_rate(chatroom_id, rate_);
 		IF can = true THEN
 			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			IF tmp > 0 THEN
 				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user" LIKE username;
+				PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
-				PERFORM inc_rate(chatroom_id, rate_);
 			END IF;
 		ELSE
 			msg:='Only users with post in the chatroom can rate';

@@ -194,12 +194,12 @@ BEGIN
 					  birthdate = birthdate_
 		WHERE login LIKE login_;
 
-	IF city_name_ IS NOT NULL AND city_name_ NOT LIKE '' THEN
+	IF city_name_ IS NOT NULL OR city_name_ NOT LIKE '' THEN
 		SELECT get_cityid(city_name_) INTO id_city_;
 		UPDATE "user" SET id_city=id_city_ WHERE login LIKE login_;
 	END IF;
 
-	IF pass_ IS NOT NULL AND pass_ NOT LIKE '' THEN
+	IF pass_ IS NOT NULL OR pass_ NOT LIKE '' THEN
 		PERFORM update_password(login_,pass_);
 	END IF;
 	EXCEPTION WHEN OTHERS THEN
