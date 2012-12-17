@@ -85,7 +85,7 @@ if(msg!=null)
 				F <input type="radio" name="gender" value="female">   <br>
 				<br>
 
-				Public: <input type="checkbox" name="public">
+				Public: <input type="checkbox" name="public" checked>
 				<br>
 				<br>
 				<br>

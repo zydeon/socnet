@@ -10,8 +10,8 @@ BEGIN
 	SELECT user_exists(receiver) into tmp;
 	IF tmp IS NOT NULL THEN
 		SELECT nextval('message_id_seq') INTO m_id;	
-		INSERT INTO message (id_message,"from",text,read_date,msg_type,attach_path)
-		       VALUES(m_id,sender,content,null,'A',attach_);
+		INSERT INTO message (id_message,"from",text,msg_type,attach_path)
+		       VALUES(m_id,sender,content,'A',attach_);
 		INSERT INTO pm (id_message,"to",read)
 		       VALUES(m_id,receiver,false);
 	END IF;	     
@@ -36,8 +36,8 @@ BEGIN
 	SELECT user_exists(receiver) into tmp;
 	IF tmp IS NOT NULL THEN
 		SELECT nextval('message_id_seq') INTO m_id;	
-		INSERT INTO message (id_message,"from",text,read_date,sent_date,msg_type,attach_path)
-		       VALUES(m_id,sender,content,null,ts,'A',attach);
+		INSERT INTO message (id_message,"from",text,sent_date,msg_type,attach_path)
+		       VALUES(m_id,sender,content,ts,'A',attach);
 		INSERT INTO pm (id_message,"to",read)
 		       VALUES(m_id,receiver,false);
 	END IF;	     

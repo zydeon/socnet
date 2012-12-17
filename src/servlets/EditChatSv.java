@@ -14,7 +14,7 @@ public class EditChatSv extends HttpServlet {
 
 		try{
 			Database.editChatroom(id_chatroom, creator, theme, closed);
-			response.sendRedirect("manage_chatrooms.jsp");
+			response.sendRedirect("edit_chatroom.jsp?id="+id_chatroom);
 		}
 		catch(SQLException e){
 			response.sendRedirect("edit_chatroom.jsp?msg="+e.getMessage()+"&id="+id_chatroom);

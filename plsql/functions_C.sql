@@ -1,72 +1,87 @@
--- CREATE OR REPLACE FUNCTION get_posts(id_chat numeric, id_parent_ numeric)
+-- CREATE OR REPLACE FUNCTION get_posts(id_chat numeric, id_parent_ numeric, userlogin varchar)
 -- RETURNS TABLE(id_message numeric, "from" varchar, text varchar, sent_date date, rlevel int, file_path varchar ) AS $$
--- DECLARE	r 	RECORD;
--- 		tmp	boolean;
+-- DECLARE        r         RECORD;
+--        n integer:=0;
 -- BEGIN
--- 	SELECT closed INTO tmp FROM chat_room WHERE id_chat = $1;
--- 	-- IF id_parent_ IS NULL THEN
--- 		FOR r IN 
--- 			SELECT m.id_message, m."from", m.text, m.sent_date, p.rlevel, m.attach_path
--- 			FROM message m, post p
--- 			WHERE m.id_message = p.id_message AND
--- 				  p.id_chatroom = $1 AND
--- 				  ((id_parent_ IS NULL AND p.id_parent IS NULL) OR
--- 				  (id_parent_ IS NOT NULL AND p.id_parent = id_parent_))
+--        SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chat AND closed=true;
+--        IF n < 1 THEN
+--                n:=0;
+--                SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE userlogin AND id_chatroom=id_chat AND read=false;
+--                IF n < 1 THEN
+--                        -- IF id_parent_ IS NULL THEN
+--                        FOR r IN 
+--                                SELECT m.id_message, m."from", m.text, m.sent_date, p.rlevel, m.attach_path
+--                                FROM message m, post p
+--                                WHERE m.id_message = p.id_message AND
+--                                          p.id_chatroom = $1 AND
+--                                          ((id_parent_ IS NULL AND p.id_parent IS NULL) OR
+--                                          (id_parent_ IS NOT NULL AND p.id_parent = id_parent_))
 
--- 			ORDER BY sent_date DESC
+--                                ORDER BY sent_date DESC
 
--- 			LOOP
--- 				id_message 	:= r.id_message;
--- 				"from" 		:= r."from";
--- 				text 		:= r.text;
--- 				sent_date 	:= r.sent_date;
--- 				rlevel 		:= r.rlevel;
--- 				file_path   := r.attach_path;
--- 				RETURN NEXT;
--- 				RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message);
--- 			END LOOP;
--- 	RETURN;
+--                                LOOP
+--                                        id_message         := r.id_message;
+--                                        "from"                 := r."from";
+--                                        text                 := r.text;
+--                                        sent_date         := r.sent_date;
+--                                        rlevel                 := r.rlevel;
+--                                        file_path   := r.attach_path;
+--                                        RETURN NEXT;
+--                                        RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message);
+--                                END LOOP;
+--                        RETURN;
+--                ELSE
+--                        RAISE EXCEPTION 'user cant read from this chatroom';
+--                END IF;
+--        ELSE
+--                RAISE EXCEPTION 'This chatroom is closed';
+--        END IF;
 -- END;
 -- $$
 -- LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_posts(id_chat numeric, id_parent_ numeric, userlogin varchar)
 RETURNS TABLE(id_message numeric, "from" varchar, text varchar, sent_date date, rlevel int, file_path varchar ) AS $$
 DECLARE        r         RECORD;
-       n integer:=0;
+        n integer:=0;
+        msg text:='system error';
 BEGIN
-       SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chat AND closed=true;
-       IF n < 1 THEN
-               n:=0;
-               SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE userlogin AND id_chatroom=id_chat AND read=false;
-               IF n < 1 THEN
-                       -- IF id_parent_ IS NULL THEN
-                       FOR r IN 
-                               SELECT m.id_message, m."from", m.text, m.sent_date, p.rlevel, m.attach_path
-                               FROM message m, post p
-                               WHERE m.id_message = p.id_message AND
-                                         p.id_chatroom = $1 AND
-                                         ((id_parent_ IS NULL AND p.id_parent IS NULL) OR
-                                         (id_parent_ IS NOT NULL AND p.id_parent = id_parent_))
+        SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chat AND closed=true;
+        IF n < 1 THEN
+                n:=0;
+                SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE userlogin AND id_chatroom=id_chat AND read=false;
+                IF n < 1 THEN
+                        -- IF id_parent_ IS NULL THEN
+                        FOR r IN 
+                                SELECT m.id_message, m."from", m.text, m.sent_date, p.rlevel, m.attach_path
+                                FROM message m, post p
+                                WHERE m.id_message = p.id_message AND
+                                          p.id_chatroom = $1 AND
+                                          ((id_parent_ IS NULL AND p.id_parent IS NULL) OR
+                                          (id_parent_ IS NOT NULL AND p.id_parent = id_parent_))
 
-                               ORDER BY sent_date DESC
+                                ORDER BY sent_date DESC
 
-                               LOOP
-                                       id_message         := r.id_message;
-                                       "from"                 := r."from";
-                                       text                 := r.text;
-                                       sent_date         := r.sent_date;
-                                       rlevel                 := r.rlevel;
-                                       file_path   := r.attach_path;
-                                       RETURN NEXT;
-                                       RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message);
-                               END LOOP;
-                       RETURN;
-               ELSE
-                       RAISE EXCEPTION 'user cant read from this chatroom';
-               END IF;
-       ELSE
-               RAISE EXCEPTION 'This chatroom is closed';
-       END IF;
+                                LOOP
+                                        id_message         := r.id_message;
+                                        "from"                 := r."from";
+                                        text                 := r.text;
+                                        sent_date         := r.sent_date;
+                                        rlevel                 := r.rlevel;
+                                        file_path   := r.attach_path;
+                                        RETURN NEXT;
+                                        RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message);
+                                END LOOP;
+                        RETURN;
+                ELSE
+                        msg:='user cant read from this chatroom';
+                        RAISE EXCEPTION '';
+                END IF;
+        ELSE
+                msg:='This chatroom is closed';
+                RAISE EXCEPTION '';
+        END IF;
+        EXCEPTION WHEN OTHERS THEN
+                RAISE EXCEPTION '%',msg;
 END;
 $$
 LANGUAGE plpgsql;
@@ -136,7 +151,8 @@ DECLARE
 BEGIN
 	SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chatroom_ AND creator=creator_;
 	IF n < 1 THEN
-		RAISE EXCEPTION 'this action can only be performed by the chatroom creator';
+		msg := 'this action can only be performed by the chatroom creator';
+		RAISE EXCEPTION '';
 	END IF;
 	IF theme_ IS NOT NULL THEN
 		SELECT count(*) INTO n FROM chat_room WHERE creator=creator_ AND upper(theme) LIKE upper(theme_);
@@ -237,12 +253,13 @@ BEGIN
                INSERT INTO post (id_message,id_parent,rlevel,id_chatroom)
                       VALUES(m_id,parent,rlevel_,id_chatroom_);
        ELSE
-               RAISE EXCEPTION '0';
+       			msg := 'This User cant write a post on this chatroom';
+               	RAISE EXCEPTION '';
        END IF;
-       EXCEPTION WHEN raise_exception THEN
-               RAISE EXCEPTION 'This User cant write a post on this chatroom';
-       WHEN unique_violation THEN
+       EXCEPTION WHEN unique_violation THEN
                RAISE EXCEPTION 'Post failure';
+       WHEN OTHERS THEN
+       			RAISE EXCEPTION '%', msg;
 END;
 $$
 LANGUAGE plpgsql;
@@ -272,19 +289,20 @@ CREATE OR REPLACE FUNCTION inc_rate(chatroom_id numeric, rate_ char)
 RETURNS VOID AS
 $$
 BEGIN
-	IF upper(rate_) = 'Y' THEN
-		UPDATE chat_room SET ratesY=(ratesY+1) WHERE id_chatroom=chatroom_id;
-	ELSE IF upper(rate_) = 'M' THEN
-		UPDATE chat_room SET ratesM=(ratesM+1) WHERE id_chatroom=chatroom_id;
-	ELSE IF upper(rate_) = 'N' THEN
-		UPDATE chat_room SET ratesN=(ratesN+1) WHERE id_chatroom=chatroom_id;
-	ELSE
-		RAISE EXCEPTION 'Invalid rate!';
-	END IF;
-	END IF;
-	END IF;
-	EXCEPTION WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+       -- AQUI
+       IF upper(rate_) LIKE 'Y' THEN
+               UPDATE chat_room SET "ratesY"=("ratesY"+1) WHERE id_chatroom=chatroom_id;
+       ELSE IF upper(rate_) LIKE 'M' THEN
+               UPDATE chat_room SET "ratesM"=("ratesM"+1) WHERE id_chatroom=chatroom_id;
+       ELSE IF upper(rate_) LIKE 'N' THEN
+               UPDATE chat_room SET "ratesN"=("ratesN"+1) WHERE id_chatroom=chatroom_id;
+       ELSE
+               RAISE EXCEPTION 'Invalid rate!';
+       END IF;
+       END IF;
+       END IF;
+       EXCEPTION WHEN OTHERS THEN
+                RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -294,19 +312,19 @@ CREATE OR REPLACE FUNCTION dec_rate(chatroom_id numeric, rate_ char)
 RETURNS VOID AS
 $$
 BEGIN
-	IF upper(rate_) = 'Y' THEN
-		UPDATE chat_room SET ratesY=(ratesY-1) WHERE id_chatroom=chatroom_id;
-	ELSE IF upper(rate_) = 'M' THEN
-		UPDATE chat_room SET ratesM=(ratesM-1) WHERE id_chatroom=chatroom_id;
-	ELSE IF upper(rate_) = 'N' THEN
-		UPDATE chat_room SET ratesN=(ratesN-1) WHERE id_chatroom=chatroom_id;
-	ELSE
-		RAISE EXCEPTION 'Invalid rate!';
-	END IF;
-	END IF;
-	END IF;
-		EXCEPTION WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+       IF upper(rate_) = 'Y' THEN
+               UPDATE chat_room SET "ratesY"=("ratesY"-1) WHERE id_chatroom=chatroom_id;
+       ELSE IF upper(rate_) = 'M' THEN
+               UPDATE chat_room SET "ratesM"=("ratesM"-1) WHERE id_chatroom=chatroom_id;
+       ELSE IF upper(rate_) = 'N' THEN
+               UPDATE chat_room SET "ratesN"=("ratesN"-1) WHERE id_chatroom=chatroom_id;
+       ELSE
+               RAISE EXCEPTION 'Invalid rate!';
+       END IF;
+       END IF;
+       END IF;
+               EXCEPTION WHEN OTHERS THEN
+               RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;
@@ -327,20 +345,18 @@ BEGIN
 		IF tmp > 0 THEN
 			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
-			--PERFORM dec_rate(chatroom_id,r);
+			PERFORM dec_rate(chatroom_id,r);
 		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
 		IF can = true THEN
-		       	--PERFORM inc_rate(chatroom_id, rate_);
-			SELECT * FROM inc_rate(chatroom_id, rate_);
 			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			IF tmp > 0 THEN
 				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user" LIKE username;
-			--	PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
+				PERFORM inc_rate(chatroom_id, rate_);
 			END IF;
 		ELSE
 			msg:='Only users with post in the chatroom can rate';
@@ -381,6 +397,33 @@ BEGIN
 	RETURN QUERY SELECT * FROM chat_room WHERE id_chatroom=id;
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
+END;
+$$
+LANGUAGE plpgsql;
+
+-- DELETE_POST()
+CREATE OR REPLACE FUNCTION delete_post(idpost integer,userlogin varchar)
+RETURNS VOID AS $$
+DECLARE
+       tmp integer:=0;
+       msg text:='system error';
+BEGIN
+       SELECT count(*) INTO tmp FROM message m WHERE m.id_message=idpost AND m."from" LIKE userlogin;
+       IF tmp > 0 THEN
+               tmp:=0;
+               SELECT count(*) INTO tmp FROM post WHERE id_parent=idpost;
+               IF tmp > 0 THEN
+                       msg:='This post have replys';
+                       RAISE EXCEPTION '';
+               ELSE
+                       DELETE FROM message m WHERE id_message=idpost AND m."from" LIKE userlogin;
+               END IF;
+       ELSE
+               msg:='This user is not the post creator';
+               RAISE EXCEPTION '';
+       END IF;
+       EXCEPTION WHEN OTHERS THEN
+               RAISE EXCEPTION '%',msg;
 END;
 $$
 LANGUAGE plpgsql;

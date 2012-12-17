@@ -38,7 +38,7 @@ if(msg!=null)
 				<a href="deleteInfo"><button>Delete All User Information</button></a>
 				<br><br>
 				<form action="edit" method="post" >	
-					Name:<br> <input type="text" name="user" id="user" placeholder="name" value="<%= userInfo.getString("name")%>"><br>
+					Name:<br> <input type="text" name="user" id="user" placeholder="name" value="<%= ((userInfo.getString("name"))==null ? 5 : 0)%>"><br>
 					Email:<br> <input type="text" name="email" placeholder="Email" value="<%= userInfo.getString("email")%>"> <br>
 					Address:<br> <input type="text" name="address" placeholder = "Address" value="<%= userInfo.getString("address")%>"> <br>
 					Country :<br>

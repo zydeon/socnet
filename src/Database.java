@@ -70,7 +70,6 @@ public class Database{
 		Boolean res = false;
 		if(con != null){
 			try{
-				String sql = "SELECT auth_user('"+user+"','"+pass+"') AS success";
 				PreparedStatement st = con.prepareStatement( "SELECT auth_user(?,?) AS success" );
 				st.setString(1, user);
 				st.setString(2, pass);
@@ -423,7 +422,7 @@ public class Database{
 		try{
 			Connection con = getConnection();
 			if(con!=null){
-				PreparedStatement st = con.prepareStatement("SELECT update_profile(?,?,?,?,?,?,?,?,?,?)");
+				PreparedStatement st = con.prepareStatement("SELECT update_profile(?,?,?,?,?,"+birthdate+",?,?,?,?)");
 				st.setString(1, user);
 				st.setString(2, pass);
 				st.setString(3, city_name);
@@ -431,16 +430,16 @@ public class Database{
 				else 			st.setNull(4, java.sql.Types.INTEGER);
 
 				st.setString(5, name);
-				st.setString(6, birthdate);
-				st.setString(7, email);
+				//st.setString(6, birthdate);
+				st.setString(6, email);
 
-				if(gender_male != null) st.setBoolean(8, gender_male);
-				else 			st.setNull(8, java.sql.Types.BOOLEAN);
+				if(gender_male != null) st.setBoolean(7, gender_male);
+				else 			st.setNull(7, java.sql.Types.BOOLEAN);
 
-				st.setString(9, address);
+				st.setString(8, address);
 
-				if(public_ != null) st.setBoolean(10, public_);
-				else 			st.setNull(10, java.sql.Types.BOOLEAN);				
+				if(public_ != null) st.setBoolean(9, public_);
+				else 			st.setNull(9, java.sql.Types.BOOLEAN);				
 
 				st.execute();
 			}       

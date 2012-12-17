@@ -29,7 +29,6 @@
 		<% while(searchedUsers.next()) {%>
 			<p><%= searchedUsers.getString("login") %></p>
 		<% } %>
-
 	<% } %>
 
 </body>
