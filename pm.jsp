@@ -12,25 +12,32 @@
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <title></title>
     <script type="text/javascript">
-      function outputPM(from,to,text,date,id,file_path){
-      var html = "<div class=post_div id='"+id+"'>"+
+    function outputPM(from,to,text,date,id,file_path){
+	var html = "<div class=post_div id='"+id+"'>"+
 	    "FROM "+from+" "+
 	    "TO "+to+"<br>"+
 	    "at "+date +"<br>"+
 	    "<p> "+text+"</p><br>";
 	if(file_path!="null"){
 	    html += "<a href='"+file_path+"'>Anexo</a>"
-	}	
+	}
+	console.log(from)
+	if(from==document.getElementById("user").value){
+	    html+="<form action='deletePM' method='post'>"+
+		"<input type='hidden' name='id' value="+id+"> "+
+		"<input type='submit' value='Delete'>"+
+		"</form>";
+	}
 	html+="</div><br><br>";
 	document.write(html);
     }    
-    function hist_func(){
-    window.location=("/socnet/pm?list=history&other="+document.getElementById("hist_link").value);
-    }
+function hist_func(){
+    window.location=("/socnetBD/pm?list=history&other="+document.getElementById("hist_link").value);
+}
     </script>
   </head>
   <body>
-        
+    <input type="hidden" id="user" value="<%=(String)session.getAttribute("user")%>">
     <h1>soc.net</h1>
     <div class="main_div">
       <h4>PM's</h4>

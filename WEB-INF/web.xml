@@ -192,6 +192,30 @@
         <url-pattern>/pm</url-pattern>
     </servlet-mapping>   
 
+    <!-- delete PM -->
+    
+    <servlet>
+      <servlet-name>DeletePM</servlet-name>
+      <servlet-class>DeletePMSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeletePM</servlet-name>
+        <url-pattern>/deletepm</url-pattern>
+    </servlet-mapping>   
+
+    <!-- delete Post -->
+    
+    <servlet>
+      <servlet-name>DeletePost</servlet-name>
+      <servlet-class>DeletePostSv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeletePost</servlet-name>
+        <url-pattern>/deletepost</url-pattern>
+    </servlet-mapping>   
+
     <!-- Rates -->
     <servlet>
       <servlet-name>Rate</servlet-name>
