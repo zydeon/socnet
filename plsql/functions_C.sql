@@ -406,25 +406,25 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION delete_post(idpost integer,userlogin varchar)
 RETURNS VOID AS $$
 DECLARE
-       tmp integer:=0;
-       msg text:='system error';
+	tmp integer:=0;
+	msg text:='system error';
 BEGIN
-       SELECT count(*) INTO tmp FROM message m WHERE m.id_message=idpost AND m."from" LIKE userlogin;
-       IF tmp > 0 THEN
-               tmp:=0;
-               SELECT count(*) INTO tmp FROM post WHERE id_parent=idpost;
-               IF tmp > 0 THEN
-                       msg:='This post have replys';
-                       RAISE EXCEPTION '';
-               ELSE
-                       DELETE FROM message m WHERE id_message=idpost AND m."from" LIKE userlogin;
-               END IF;
-       ELSE
-               msg:='This user is not the post creator';
-               RAISE EXCEPTION '';
-       END IF;
-       EXCEPTION WHEN OTHERS THEN
-               RAISE EXCEPTION '%',msg;
+	SELECT count(*) INTO tmp FROM message m WHERE m.id_message=idpost AND m."from" LIKE userlogin;
+	IF tmp > 0 THEN
+		tmp:=0;
+		SELECT count(*) INTO tmp FROM post WHERE id_parent=idpost;
+		IF tmp > 0 THEN
+			msg:='This post have replys';
+			RAISE EXCEPTION '';
+		ELSE
+			DELETE FROM message m WHERE id_message=idpost AND m."from" LIKE userlogin;
+		END IF;
+	ELSE
+		msg:='This user is not the post creator';
+		RAISE EXCEPTION '';
+	END IF;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE EXCEPTION '%',msg;
 END;
 $$
 LANGUAGE plpgsql;

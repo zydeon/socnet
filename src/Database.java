@@ -43,7 +43,7 @@ public class Database{
 		}
 		return con;
 	}
-    
+	
 	public static synchronized Connection getConnection( ){
 		if( initialized ){
 			try{
@@ -87,47 +87,47 @@ public class Database{
 		return res;
 	}
 
-	// public static boolean existsUser(String user){
-	// 	Connection con = Database.getConnection();
-	// 	Boolean res = false;
-	// 	if(con != null){
-	// 		try{
-	// 			String sql = "SELECT user_exists('"+user+"') AS exists;";
-	// 			Statement st = con.createStatement();
-	// 			ResultSet rs = st.executeQuery(sql);
+    // public static boolean existsUser(String user){
+    // 	Connection con = Database.getConnection();
+    // 	Boolean res = false;
+    // 	if(con != null){
+    // 		try{
+    // 			String sql = "SELECT user_exists('"+user+"') AS exists;";
+    // 			Statement st = con.createStatement();
+    // 			ResultSet rs = st.executeQuery(sql);
 
-	// 			if( rs.next() )
-	// 				res = rs.getBoolean("exists");
-				
-	// 			Database.putConnection(con);
-	// 		}
-	// 		catch(SQLException e){
-	// 			System.out.println(e);
-	// 		}
-	// 	}
-	// 	return res;
-	// }
+    // 			if( rs.next() )
+    // 				res = rs.getBoolean("exists");
+	
+    // 			Database.putConnection(con);
+    // 		}
+    // 		catch(SQLException e){
+    // 			System.out.println(e);
+    // 		}
+    // 	}
+    // 	return res;
+    // }
 
-    public static ArrayList<String> getUserNames() throws SQLException{
-	Connection con = Database.getConnection();
-	ArrayList<String> names = new ArrayList<String>();
-	if(con != null){
-	    PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_names()");
-	    ResultSet rs = st.executeQuery();
-	    try{
-		while(rs.next())
-		    names.add(rs.getString(1));
+	public static ArrayList<String> getUserNames() throws SQLException{
+		Connection con = Database.getConnection();
+		ArrayList<String> names = new ArrayList<String>();
+		if(con != null){
+			PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_names()");
+			ResultSet rs = st.executeQuery();
+			try{
+				while(rs.next())
+					names.add(rs.getString(1));
 				
 				Database.putConnection(con);
-		    }catch(SQLException e){
+			}catch(SQLException e){
 				System.out.println(e);
-	    	}
+			}
 		}
 		return names;
-    }
-    
+	}
+	
 	public static void registerUser(String user, String pass, String name, String id_country, String city_name,
-									   String birthdate, String email, String address, boolean public_, Boolean gender_male) throws SQLException{
+		String birthdate, String email, String address, boolean public_, Boolean gender_male) throws SQLException{
 		Integer id_city = null;
 		Connection con = getConnection();
 		if(con != null){
@@ -210,43 +210,43 @@ public class Database{
 
 		return rs;
 	}
-    public static ResultSet getOutbox(String username) throws SQLException{
+	public static ResultSet getOutbox(String username) throws SQLException{
 		ResultSet rs = null;
 
 		try{
-		    Connection con = getConnection();
-		    if(con!=null){
+			Connection con = getConnection();
+			if(con!=null){
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_outbox(?);");
 				st.setString(1, username);
 				rs = st.executeQuery();
 				putConnection(con);
-		    }
+			}
 		}
 		catch( java.sql.SQLException e){
-		    System.out.println(e);
+			System.out.println(e);
 		}
 
 		return rs;
 	}
 
-    public static ResultSet getHistory(String user1, String user2) throws SQLException{
+	public static ResultSet getHistory(String user1, String user2) throws SQLException{
 		ResultSet rs = null;
 
 		try{
-		    Connection con = getConnection();
-		    if(con!=null){
+			Connection con = getConnection();
+			if(con!=null){
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_history(?,?);");
 				st.setString(1, user1);
 				st.setString(2, user2);
 				
 				rs = st.executeQuery();
 				putConnection(con);
-		    }
+			}
 		}
 		catch( java.sql.SQLException e){
-		    System.out.println(e);
+			System.out.println(e);
 		}
-
+		
 		return rs;
 	}
 
@@ -281,7 +281,7 @@ public class Database{
 				putConnection(con);
 			}
 		}
-		catch( java.sql.SQLException e){
+		catch(java.sql.SQLException e){
 			System.out.println(e);
 		}
 
@@ -294,32 +294,32 @@ public class Database{
 		if(con!=null){
 			PreparedStatement st = con.prepareStatement("SELECT update_chatroom(?,?,?,?);");
 			if(id_chatroom != null) st.setInt(1, id_chatroom);
-			else 			st.setNull(1, java.sql.Types.INTEGER);
+			else st.setNull(1, java.sql.Types.INTEGER);
 			st.setString(2, creator);
 			st.setString(3, theme);
 			if(closed != null) st.setBoolean(4, closed);
 			else 			st.setNull(4, java.sql.Types.BOOLEAN);
 
 			rs = st.executeQuery();
-			putConnection(con);
 		}
+		putConnection(con);
 		return rs;
 	}
 
-    public static ResultSet getInbox(String username) throws SQLException{
+	public static ResultSet getInbox(String username) throws SQLException{
 		ResultSet rs = null;
 
 		try{
-		    Connection con = getConnection();
-		    if(con!=null){
+			Connection con = getConnection();
+			if(con!=null){
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_inbox(?);");
 				st.setString(1, username);
 				rs = st.executeQuery();
-				putConnection(con);
-		    }
+			}
+			putConnection(con);
 		}
 		catch( java.sql.SQLException e){
-		    System.out.println(e);
+			System.out.println(e);
 		}
 
 		return rs;
@@ -332,9 +332,9 @@ public class Database{
 			PreparedStatement st = con.prepareStatement("SELECT * FROM get_posts(?,NULL)");
 			st.setInt(1, Integer.parseInt(id_chatroom) );
 			rs = st.executeQuery();
-			putConnection(con);
 		}
 
+		putConnection(con);
 		return rs;
 	}
 
@@ -347,7 +347,7 @@ public class Database{
 			ResultSet rs = st.executeQuery();
 			if(rs.next())
 				theme = rs.getString("theme");
-
+			
 			putConnection(con);
 		}
 		return theme;
@@ -362,6 +362,7 @@ public class Database{
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_info(?)");
 				st.setString(1, user);
 				rs = st.executeQuery();
+				putConnection(con);
 			}       
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
@@ -380,44 +381,45 @@ public class Database{
 		}
 	}
 
-    public static boolean addPM(String from, String to,String text,String attach, String time){
+	public static boolean addPM(String from, String to,String text,String attach, String time){
 
-	System.out.println("FROM "+from+ " TO "+to+" TEXT "+text+" PATH "+attach+" TIME "+time);
-	try{
-	    Connection con = getConnection();
-	    if(con!=null){
-		PreparedStatement st= null;
-		if(time == null)
-		    st = con.prepareStatement("SELECT add_pm(?,?,?,?);");
-		else 
-		    st = con.prepareStatement("SELECT add_delayed_pm(?,?,?,?,?);");
-		
-		st.setString(1, from);
-		st.setString(2, to);
-		st.setString(3, text);
-		st.setString(4, attach);
+		System.out.println("FROM "+from+ " TO "+to+" TEXT "+text+" PATH "+attach+" TIME "+time);
+		try{
+			Connection con = getConnection();
+			if(con!=null){
+				PreparedStatement st= null;
+				if(time == null)
+					st = con.prepareStatement("SELECT add_pm(?,?,?,?);");
+				else 
+					st = con.prepareStatement("SELECT add_delayed_pm(?,?,?,?,?);");
+				
+				st.setString(1, from);
+				st.setString(2, to);
+				st.setString(3, text);
+				st.setString(4, attach);
 
-		if(time != null){
-		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		    try{
-			java.util.Date parsedDate = dateFormat.parse(time);
-			java.sql.Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-			st.setTimestamp(5, timestamp);
-		    }catch(java.text.ParseException e){
+				if(time != null){
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					try{
+						java.util.Date parsedDate = dateFormat.parse(time);
+						java.sql.Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+						st.setTimestamp(5, timestamp);
+					}catch(java.text.ParseException e){
+						System.out.println(e);
+					}
+					
+				}
+				
+				st.execute();
+				putConnection(con);
+			}
+		}catch( java.sql.SQLException e){
 			System.out.println(e);
-		    }
-		    
-		}
-
-		st.execute();
-	    }
-	}catch( java.sql.SQLException e){
-	    System.out.println(e);
-	}		
-	return true;
-    }
-    
-    
+		}		
+		return true;
+	}
+	
+	
 	public static void updateProfile(String user, String pass, String city_name, Integer id_country, String name, String birthdate, String email, Boolean gender_male, String address, Boolean public_){
 		try{
 			Connection con = getConnection();
@@ -442,6 +444,7 @@ public class Database{
 				else 			st.setNull(9, java.sql.Types.BOOLEAN);				
 
 				st.execute();
+				putConnection(con);
 			}       
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
@@ -456,6 +459,7 @@ public class Database{
 				st.setString(1, user);
 				st.setBoolean(2, disabled);
 				st.executeUpdate();
+				putConnection(con);
 			}
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
@@ -495,6 +499,7 @@ public class Database{
 				else 			st.setNull(9, java.sql.Types.BOOLEAN);				
 
 				rs = st.executeQuery();
+				putConnection(con);
 			}
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
@@ -521,6 +526,30 @@ public class Database{
 			else 			   st.setNull(6, java.sql.Types.INTEGER);				
 
 			st.execute();
+			putConnection(con);
+		}	
+	}
+	public static void deletePost(int id,String from) throws SQLException{
+		Connection con = getConnection();
+		if(con!=null){
+			PreparedStatement st = con.prepareStatement("SELECT delete_post(?,?);");
+			st.setInt(1, id);
+			st.setString(2, from);				
+
+			st.execute();
+			putConnection(con);
+		}	
+	}
+
+	public static void deletePM(int id,String from) throws SQLException{
+		Connection con = getConnection();
+		if(con!=null){
+			PreparedStatement st = con.prepareStatement("SELECT delete_pm(?,?);");
+			st.setInt(1, id);
+			st.setString(2, from);				
+
+			st.execute();
+			putConnection(con);
 		}	
 	}
 
@@ -534,6 +563,7 @@ public class Database{
 				st.setString(2, theme);				
 
 				rs = st.executeQuery();
+				putConnection(con);
 			}
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
@@ -547,12 +577,13 @@ public class Database{
 			PreparedStatement st = con.prepareStatement("SELECT delete_activity(?);");
 			st.setString(1, user);
 			st.execute();
+			putConnection(con);
 		}
 	}
 
-    public static void addRate(String user, int chatroom,String rate) throws java.sql.SQLException{
-	ResultSet rs = null;
-	System.out.println(user + chatroom + rate);
+	public static void addRate(String user, int chatroom,String rate) throws java.sql.SQLException{
+		ResultSet rs = null;
+		System.out.println(user + chatroom + rate);
 		try{
 			Connection con = getConnection();
 			if(con!=null){
@@ -562,6 +593,7 @@ public class Database{
 				st.setString(3,rate);
 
 				st.execute();
+				putConnection(con);
 			}
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
