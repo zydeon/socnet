@@ -10,7 +10,6 @@ public class PMSv extends HttpServlet{
 	String list = request.getParameter("list");
 	System.out.println("LIST="+list);
 	if(list != null){
-	    try{
 		java.sql.ResultSet pms = null;
 		if( list.equals("inbox")){
 		    pms = Database.getInbox((String)request.getSession().getAttribute("user"));
@@ -26,10 +25,6 @@ public class PMSv extends HttpServlet{
 		RequestDispatcher dispatcher = request.getRequestDispatcher("pm.jsp");
 		dispatcher.forward(request, response);
 		
-	    }
-	    catch(SQLException e){
-		System.out.println("INVALID PM LIST");	
-	    }
 	}
 	else{
 	    System.out.println("INVALID PM LIST");	

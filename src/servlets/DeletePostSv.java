@@ -11,11 +11,13 @@ public class DeletePostSv extends HttpServlet {
 	Integer id_post=Integer.parseInt(request.getParameter("id"));
 	String src  = (String)request.getSession().getAttribute("user");
 	
+	Connection con = Database.getConnection();
 	try{
-	    Database.deletePost(id_post,src);
+	    Database.deletePost(con, id_post,src);
 	    response.sendRedirect("chat");
 	}
 	catch(SQLException e){
+		Database.putConnection(con);
 	    response.sendRedirect("chat.jsp?msg="+e.getMessage());
 	}    
     }	

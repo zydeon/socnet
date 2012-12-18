@@ -163,6 +163,17 @@
         <url-pattern>/newPost</url-pattern>
     </servlet-mapping>          
 
+    <!-- NEW REPLY -->
+    <servlet>
+        <servlet-name>NewReply</servlet-name>
+        <servlet-class>NewReplySv</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>NewReply</servlet-name>
+        <url-pattern>/newReply</url-pattern>
+    </servlet-mapping>    
+
     <!-- NEW PM -->
     <servlet>
         <servlet-name>NewPM</servlet-name>
@@ -201,7 +212,7 @@
 
     <servlet-mapping>
         <servlet-name>DeletePM</servlet-name>
-        <url-pattern>/deletepm</url-pattern>
+        <url-pattern>/deletePM</url-pattern>
     </servlet-mapping>   
 
     <!-- delete Post -->
@@ -213,7 +224,7 @@
 
     <servlet-mapping>
         <servlet-name>DeletePost</servlet-name>
-        <url-pattern>/deletepost</url-pattern>
+        <url-pattern>/deletePost</url-pattern>
     </servlet-mapping>   
 
     <!-- Rates -->

@@ -8,13 +8,13 @@ if(msg!=null)
 <html>
 <head>
     <script type="text/javascript">
-    function outputPost(source, text, sentDate, replyLevel, owner, ID, filePath){
+    function outputPost(source, text, sentDate, replyLevel, owner, ID, filePath, id_chatroom){
 	var rl = parseInt(replyLevel);
 	var html =  "<div class=post_div id='"+ID+"' style='position:relative;left:"+(rl*50)+"'>" +
 	    "FROM "+source+" <br>"+
 	    "date:"+ sentDate +"<br>"+
 	    "<p>"+text+"</p>"+
-	    "<button onclick=\"newReply('"+ID+"','"+(rl+1)+"')\">Reply</button>";
+	    "<button onclick=\"newReply('"+ID+"','"+(rl+1)+"','"+id_chatroom+"')\">Reply</button>";
 
 	if(filePath!="null"){
 	    html += "<a href=\""+filePath+"\">Anexo</a>"
@@ -30,12 +30,13 @@ if(msg!=null)
 	html += "</div><br><br>";				
 	document.write(html);
     }	
-		function newReply(parent, replyLvl){
+		function newReply(parent, replyLvl, id_chatroom){
 			div = document.createElement('div');
 			div.innerHTML = "<form action='newReply' method='post'>"+
 			"<textarea name='text' rows='2' cols='30'>"+
 			"</textarea>"+
 			"<br>"+
+			"<input type='hidden' name='id_chatroom' value='"+id_chatroom+"'>"+
 			"<input type='hidden' name='parent' value='"+parent+"'>"+
 			"<input type='hidden' name='replyLvl' value='"+replyLvl+"'>"+
 			"<input type='submit' value='Submit'>"+
@@ -71,27 +72,29 @@ if(msg!=null)
 		<a href="rate?r=M&id=<%=id_chatroom%>"><button>M</button></a>
 		<a href="rate?r=N&id=<%=id_chatroom%>"><button>N</button></a>
 		<hr><br>
-		<script type="text/javascript"> newPost("<%=id_chatroom%>"); </script>
+		<script type="text/javascript"> newPost("<%=id_chatroom%>"); </script>	
 
-		<% while( posts.next() ) { %>
-		<% String from      = posts.getString("from"); %>
-		<% String text      = posts.getString("text"); %>
-		<% String sent_date = posts.getString("sent_date"); %>
-		<% Integer rlevel   = posts.getInt("rlevel"); %>
-		<% Integer id       = posts.getInt("id_message"); %>
-		<% String file_path = posts.getString("file_path"); %>
-		<% Boolean owner    = ((String)session.getAttribute("user")).equals(from); %>
+		<% if(posts!=null) { %>
+			<% while( posts.next() ) { %>
+				<% String from      = posts.getString("from"); %>
+				<% String text      = posts.getString("text"); %>
+				<% String sent_date = posts.getString("sent_date"); %>
+				<% Integer rlevel   = posts.getInt("rlevel"); %>
+				<% Integer id       = posts.getInt("id_message"); %>
+				<% String file_path = posts.getString("file_path"); %>
+				<% Boolean owner    = ((String)session.getAttribute("user")).equals(from); %>
 
-		<script type="text/javascript"> outputPost("<%=from%>",
-			"<%=text%>",
-			"<%=sent_date%>",
-			"<%=rlevel%>",
-			"<%=owner%>",
-			"<%=id%>",
-			"<%=file_path%>");
-		</script>
-		<% } %>		
-		
+				<script type="text/javascript"> outputPost("<%=from%>",
+					"<%=text%>",
+					"<%=sent_date%>",
+					"<%=rlevel%>",
+					"<%=owner%>",
+					"<%=id%>",
+					"<%=file_path%>",
+					"<%=id_chatroom%>");
+				</script>
+				<% } %>			
+		<% } %>			
 
 	</body>
 	</html> 

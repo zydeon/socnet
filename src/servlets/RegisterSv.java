@@ -35,13 +35,20 @@ public class RegisterSv extends HttpServlet {
 		
 		boolean public_ = request.getParameter("public") != null;
 
+		Connection con = Database.getConnection();
 		try{
-			Database.registerUser(user, pass, name, id_country, city_name, birthdate, email, address, public_, gender_male);
+			Database.registerUser(con, user, pass, name, id_country, city_name, birthdate, email, address, public_, gender_male);
 			System.out.println("registo deu");
 			request.getSession(true).setAttribute("user", user);
 			response.sendRedirect("");			
 		}
 		catch(SQLException e){
+			try{
+				con.rollback();
+				con.setAutoCommit(true);
+			}
+			catch(SQLException e_){System.out.println("Rolling back: "+e_);}
+			Database.putConnection(con);			
 			response.sendRedirect("register.jsp?msg="+e.getMessage());
 		}
 	}

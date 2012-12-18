@@ -11,11 +11,13 @@ public class DeletePMSv extends HttpServlet {
 	Integer id_pm=Integer.parseInt(request.getParameter("id"));
 	String src  = (String)request.getSession().getAttribute("user");
 	
+	Connection con = Database.getConnection();
 	try{
-	    Database.deletePM(id_pm,src);
+	    Database.deletePM(con, id_pm,src);
 	    response.sendRedirect("pm?list=inbox");
 	}
 	catch(SQLException e){
+		Database.putConnection(con);
 	    response.sendRedirect("pm?list=inbox");
 	}    
     }	

@@ -1,54 +1,11 @@
--- CREATE OR REPLACE FUNCTION get_posts(id_chat numeric, id_parent_ numeric, userlogin varchar)
--- RETURNS TABLE(id_message numeric, "from" varchar, text varchar, sent_date date, rlevel int, file_path varchar ) AS $$
--- DECLARE        r         RECORD;
---        n integer:=0;
--- BEGIN
---        SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chat AND closed=true;
---        IF n < 1 THEN
---                n:=0;
---                SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE userlogin AND id_chatroom=id_chat AND read=false;
---                IF n < 1 THEN
---                        -- IF id_parent_ IS NULL THEN
---                        FOR r IN 
---                                SELECT m.id_message, m."from", m.text, m.sent_date, p.rlevel, m.attach_path
---                                FROM message m, post p
---                                WHERE m.id_message = p.id_message AND
---                                          p.id_chatroom = $1 AND
---                                          ((id_parent_ IS NULL AND p.id_parent IS NULL) OR
---                                          (id_parent_ IS NOT NULL AND p.id_parent = id_parent_))
-
---                                ORDER BY sent_date DESC
-
---                                LOOP
---                                        id_message         := r.id_message;
---                                        "from"                 := r."from";
---                                        text                 := r.text;
---                                        sent_date         := r.sent_date;
---                                        rlevel                 := r.rlevel;
---                                        file_path   := r.attach_path;
---                                        RETURN NEXT;
---                                        RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message);
---                                END LOOP;
---                        RETURN;
---                ELSE
---                        RAISE EXCEPTION 'user cant read from this chatroom';
---                END IF;
---        ELSE
---                RAISE EXCEPTION 'This chatroom is closed';
---        END IF;
--- END;
--- $$
--- LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_posts(id_chat numeric, id_parent_ numeric, userlogin varchar)
 RETURNS TABLE(id_message numeric, "from" varchar, text varchar, sent_date date, rlevel int, file_path varchar ) AS $$
 DECLARE        r         RECORD;
         n integer:=0;
         msg text:='system error';
 BEGIN
-        SELECT count(*) INTO n FROM chat_room WHERE id_chatroom=id_chat AND closed=true;
-        IF n < 1 THEN
                 n:=0;
-                SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE userlogin AND id_chatroom=id_chat AND read=false;
+                SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE userlogin AND id_chatroom=id_chat AND read=true;
                 IF n < 1 THEN
                         -- IF id_parent_ IS NULL THEN
                         FOR r IN 
@@ -69,17 +26,13 @@ BEGIN
                                         rlevel                 := r.rlevel;
                                         file_path   := r.attach_path;
                                         RETURN NEXT;
-                                        RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message);
+                                        RETURN QUERY SELECT * FROM get_posts(id_chat, r.id_message, userlogin);
                                 END LOOP;
                         RETURN;
                 ELSE
                         msg:='user cant read from this chatroom';
                         RAISE EXCEPTION '';
                 END IF;
-        ELSE
-                msg:='This chatroom is closed';
-                RAISE EXCEPTION '';
-        END IF;
         EXCEPTION WHEN OTHERS THEN
                 RAISE EXCEPTION '%',msg;
 END;
@@ -101,7 +54,7 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_chatrooms()
 RETURNS SETOF chat_room AS $$
 BEGIN
-	RETURN QUERY SELECT * FROM chat_room WHERE closed=false;
+	RETURN QUERY SELECT * FROM chat_room;
 	EXCEPTION WHEN OTHERS THEN
 		RAISE EXCEPTION 'system error';
 END;
@@ -218,44 +171,33 @@ $$
 LANGUAGE plpgsql;
 
 
---ADD_POST() TRANSACTION
--- CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender varchar, content varchar, parent integer, attach_ varchar, rlevel_ integer)
--- RETURNS VOID AS
--- $$
--- DECLARE
--- 	m_id integer;
--- BEGIN
--- 	SELECT nextval('message_id_seq') INTO m_id;	
--- 	INSERT INTO message (id_message,"from",text,msg_type,attach_path)
--- 	       VALUES(m_id,sender,content,'b',attach_);
--- 	INSERT INTO post (id_message,id_parent,rlevel,id_chatroom)
--- 	       VALUES(m_id,parent,rlevel_,id_chatroom_);
--- EXCEPTION
--- 	WHEN unique_violation THEN
--- 		RAISE EXCEPTION 'Post failure';
--- 	RETURN;
--- END;
--- $$
--- LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION add_post(id_chatroom_ integer, sender varchar, content varchar, parent integer, attach_ varchar, rlevel_ integer)
 RETURNS VOID AS
 $$
 DECLARE
 	m_id integer;
 	n integer:=0;
+	m integer:=0;
 	msg text:='system error';
 BEGIN
-       SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE sender AND id_chatroom=id_chatroom_;
-       IF n < 1 THEN
-               SELECT nextval('message_id_seq') INTO m_id;        
-               INSERT INTO message (id_message,"from",text,msg_type,attach_path)
-                      VALUES(m_id,sender,content,'b',attach_);
-               INSERT INTO post (id_message,id_parent,rlevel,id_chatroom)
-                      VALUES(m_id,parent,rlevel_,id_chatroom_);
-       ELSE
-       			msg := 'This User cant write a post on this chatroom';
-               	RAISE EXCEPTION '';
-       END IF;
+		SELECT count(*) INTO m FROM chat_room WHERE id_chatroom=id_chatroom_ AND closed=true;
+		IF m < 1 THEN
+
+	       SELECT count(*) INTO n FROM restrictions WHERE "user" LIKE sender AND id_chatroom=id_chatroom_;
+	       IF n < 1 THEN
+	               SELECT nextval('message_id_seq') INTO m_id;        
+	               INSERT INTO message (id_message,"from",text,msg_type,attach_path)
+	                      VALUES(m_id,sender,content,'b',attach_);
+	               INSERT INTO post (id_message,id_parent,rlevel,id_chatroom)
+	                      VALUES(m_id,parent,rlevel_,id_chatroom_);
+	       ELSE
+	       			msg := 'This User cant write a post on this chatroom';
+	               	RAISE EXCEPTION '';
+	       END IF;
+        ELSE
+                msg:='This chatroom is closed';
+                RAISE EXCEPTION '';
+        END IF;	       
        EXCEPTION WHEN unique_violation THEN
                RAISE EXCEPTION 'Post failure';
        WHEN OTHERS THEN
@@ -284,50 +226,50 @@ $$
 LANGUAGE plpgsql;
 
 
---INC_RATE()
-CREATE OR REPLACE FUNCTION inc_rate(chatroom_id numeric, rate_ char)
-RETURNS VOID AS
-$$
-BEGIN
-       -- AQUI
-       IF upper(rate_) LIKE 'Y' THEN
-               UPDATE chat_room SET "ratesY"=("ratesY"+1) WHERE id_chatroom=chatroom_id;
-       ELSE IF upper(rate_) LIKE 'M' THEN
-               UPDATE chat_room SET "ratesM"=("ratesM"+1) WHERE id_chatroom=chatroom_id;
-       ELSE IF upper(rate_) LIKE 'N' THEN
-               UPDATE chat_room SET "ratesN"=("ratesN"+1) WHERE id_chatroom=chatroom_id;
-       ELSE
-               RAISE EXCEPTION 'Invalid rate!';
-       END IF;
-       END IF;
-       END IF;
-       EXCEPTION WHEN OTHERS THEN
-                RAISE EXCEPTION 'system error';
-END;
-$$
-LANGUAGE plpgsql;
+-- --INC_RATE()
+-- CREATE OR REPLACE FUNCTION inc_rate(chatroom_id numeric, rate_ char)
+-- RETURNS VOID AS
+-- $$
+-- BEGIN
+--        -- AQUI
+--        IF upper(rate_) LIKE 'Y' THEN
+--                UPDATE chat_room SET "ratesY"=("ratesY"+1) WHERE id_chatroom=chatroom_id;
+--        ELSE IF upper(rate_) LIKE 'M' THEN
+--                UPDATE chat_room SET "ratesM"=("ratesM"+1) WHERE id_chatroom=chatroom_id;
+--        ELSE IF upper(rate_) LIKE 'N' THEN
+--                UPDATE chat_room SET "ratesN"=("ratesN"+1) WHERE id_chatroom=chatroom_id;
+--        ELSE
+--                RAISE EXCEPTION 'Invalid rate!';
+--        END IF;
+--        END IF;
+--        END IF;
+--        EXCEPTION WHEN OTHERS THEN
+--                 RAISE EXCEPTION 'system error';
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
 --DEC_RATE()
-CREATE OR REPLACE FUNCTION dec_rate(chatroom_id numeric, rate_ char)
-RETURNS VOID AS
-$$
-BEGIN
-       IF upper(rate_) = 'Y' THEN
-               UPDATE chat_room SET "ratesY"=("ratesY"-1) WHERE id_chatroom=chatroom_id;
-       ELSE IF upper(rate_) = 'M' THEN
-               UPDATE chat_room SET "ratesM"=("ratesM"-1) WHERE id_chatroom=chatroom_id;
-       ELSE IF upper(rate_) = 'N' THEN
-               UPDATE chat_room SET "ratesN"=("ratesN"-1) WHERE id_chatroom=chatroom_id;
-       ELSE
-               RAISE EXCEPTION 'Invalid rate!';
-       END IF;
-       END IF;
-       END IF;
-               EXCEPTION WHEN OTHERS THEN
-               RAISE EXCEPTION 'system error';
-END;
-$$
-LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION dec_rate(chatroom_id numeric, rate_ char)
+-- RETURNS VOID AS
+-- $$
+-- BEGIN
+--        IF upper(rate_) = 'Y' THEN
+--                UPDATE chat_room SET "ratesY"=("ratesY"-1) WHERE id_chatroom=chatroom_id;
+--        ELSE IF upper(rate_) = 'M' THEN
+--                UPDATE chat_room SET "ratesM"=("ratesM"-1) WHERE id_chatroom=chatroom_id;
+--        ELSE IF upper(rate_) = 'N' THEN
+--                UPDATE chat_room SET "ratesN"=("ratesN"-1) WHERE id_chatroom=chatroom_id;
+--        ELSE
+--                RAISE EXCEPTION 'Invalid rate!';
+--        END IF;
+--        END IF;
+--        END IF;
+--                EXCEPTION WHEN OTHERS THEN
+--                RAISE EXCEPTION 'system error';
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
 --RATE_CHATROOM()
 CREATE OR REPLACE FUNCTION rate_chatroom(username varchar, chatroom_id numeric, rate_ char)
@@ -345,17 +287,17 @@ BEGIN
 		IF tmp > 0 THEN
 			SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			DELETE FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
-			PERFORM dec_rate(chatroom_id,r);
+			--PERFORM dec_rate(chatroom_id,r);
 		END IF;
 	ELSE
 		SELECT can_rate(username, chatroom_id) INTO can;
-		PERFORM inc_rate(chatroom_id, rate_);
+		--PERFORM inc_rate(chatroom_id, rate_);
 		IF can = true THEN
 			SELECT count(*) INTO tmp FROM rates m WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 			IF tmp > 0 THEN
 				SELECT rate INTO r FROM rates WHERE id_chatroom=chatroom_id AND "user" LIKE username;
 				UPDATE rates SET rate=upper(rate_) WHERE id_chatroom=chatroom_id AND "user" LIKE username;
-				PERFORM dec_rate(chatroom_id,r);
+				--PERFORM dec_rate(chatroom_id,r);
 			ELSE
 				INSERT INTO rates ("user",id_chatroom,rate) VALUES (username, chatroom_id, upper(rate_));
 			END IF;

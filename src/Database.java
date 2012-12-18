@@ -87,34 +87,13 @@ public class Database{
 		return res;
 	}
 
-    // public static boolean existsUser(String user){
-    // 	Connection con = Database.getConnection();
-    // 	Boolean res = false;
-    // 	if(con != null){
-    // 		try{
-    // 			String sql = "SELECT user_exists('"+user+"') AS exists;";
-    // 			Statement st = con.createStatement();
-    // 			ResultSet rs = st.executeQuery(sql);
-
-    // 			if( rs.next() )
-    // 				res = rs.getBoolean("exists");
-	
-    // 			Database.putConnection(con);
-    // 		}
-    // 		catch(SQLException e){
-    // 			System.out.println(e);
-    // 		}
-    // 	}
-    // 	return res;
-    // }
-
-	public static ArrayList<String> getUserNames() throws SQLException{
+	public static ArrayList<String> getUserNames(){
 		Connection con = Database.getConnection();
 		ArrayList<String> names = new ArrayList<String>();
 		if(con != null){
+			try{
 			PreparedStatement st = con.prepareStatement("SELECT * FROM get_user_names()");
 			ResultSet rs = st.executeQuery();
-			try{
 				while(rs.next())
 					names.add(rs.getString(1));
 				
@@ -126,15 +105,16 @@ public class Database{
 		return names;
 	}
 	
-	public static void registerUser(String user, String pass, String name, String id_country, String city_name,
+	public static void registerUser(Connection con, String user, String pass, String name, String id_country, String city_name,
 		String birthdate, String email, String address, boolean public_, Boolean gender_male) throws SQLException{
 		Integer id_city = null;
-		Connection con = getConnection();
 		if(con != null){
+			con.setAutoCommit(false);
 			String sql = "SELECT register_user('"+user+"', '"+pass+"', '"+name+"', "+id_country+", '"+city_name+"', "+birthdate+", '"+email+"', '"+address+"', "+public_+", "+gender_male+");";
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql);
-			
+			con.commit();
+			con.setAutoCommit(true);
 			Database.putConnection(con);
 		}
 	}
@@ -210,7 +190,7 @@ public class Database{
 
 		return rs;
 	}
-	public static ResultSet getOutbox(String username) throws SQLException{
+	public static ResultSet getOutbox(String username){
 		ResultSet rs = null;
 
 		try{
@@ -229,17 +209,20 @@ public class Database{
 		return rs;
 	}
 
-	public static ResultSet getHistory(String user1, String user2) throws SQLException{
+	public static ResultSet getHistory(String user1, String user2){
 		ResultSet rs = null;
 
 		try{
 			Connection con = getConnection();
 			if(con!=null){
+				con.setAutoCommit(false);
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_history(?,?);");
 				st.setString(1, user1);
 				st.setString(2, user2);
 				
 				rs = st.executeQuery();
+				con.commit();
+				con.setAutoCommit(true);
 				putConnection(con);
 			}
 		}
@@ -288,10 +271,10 @@ public class Database{
 		return rs;
 	}
 
-	public static ResultSet editChatroom(Integer id_chatroom, String creator, String theme, Boolean closed) throws SQLException{
-		ResultSet rs = null;
-		Connection con = getConnection();
+	public static void editChatroom(Connection con, Integer id_chatroom, String creator, String theme, Boolean closed) throws SQLException{
+		//Connection con = getConnection();
 		if(con!=null){
+			con.setAutoCommit(false);
 			PreparedStatement st = con.prepareStatement("SELECT update_chatroom(?,?,?,?);");
 			if(id_chatroom != null) st.setInt(1, id_chatroom);
 			else st.setNull(1, java.sql.Types.INTEGER);
@@ -300,37 +283,47 @@ public class Database{
 			if(closed != null) st.setBoolean(4, closed);
 			else 			st.setNull(4, java.sql.Types.BOOLEAN);
 
-			rs = st.executeQuery();
+			st.execute();
+			con.commit();
+			con.setAutoCommit(true);
+			putConnection(con);
 		}
-		putConnection(con);
-		return rs;
 	}
 
-	public static ResultSet getInbox(String username) throws SQLException{
+	public static ResultSet getInbox(String username){
 		ResultSet rs = null;
-
+		Connection con = null;
 		try{
-			Connection con = getConnection();
+			con = getConnection();
 			if(con!=null){
+				con.setAutoCommit(false);
 				PreparedStatement st = con.prepareStatement("SELECT * FROM get_inbox(?);");
 				st.setString(1, username);
 				rs = st.executeQuery();
+				con.commit();
+				con.setAutoCommit(true);
+				putConnection(con);
 			}
-			putConnection(con);
 		}
 		catch( java.sql.SQLException e){
 			System.out.println(e);
+			try{
+				con.rollback();
+				con.setAutoCommit(true);
+			}
+			catch(SQLException e_){System.out.println("Rolling back: "+e_);}
+			putConnection(con);
 		}
 
 		return rs;
 	}
 
-	public static ResultSet getPosts(String id_chatroom) throws SQLException{
+	public static ResultSet getPosts(Connection con, String id_chatroom, String userlogin) throws SQLException{
 		ResultSet rs = null;
-		Connection con = getConnection();
 		if(con!=null){
-			PreparedStatement st = con.prepareStatement("SELECT * FROM get_posts(?,NULL)");
+			PreparedStatement st = con.prepareStatement("SELECT * FROM get_posts(?,NULL,?)");
 			st.setInt(1, Integer.parseInt(id_chatroom) );
+			st.setString(2, userlogin );
 			rs = st.executeQuery();
 		}
 
@@ -338,9 +331,8 @@ public class Database{
 		return rs;
 	}
 
-	public static String getChatroomTheme(String id) throws SQLException{
+	public static String getChatroomTheme(Connection con, String id) throws SQLException{
 		String theme = "";
-		Connection con = getConnection();
 		if(con!=null){
 			PreparedStatement st = con.prepareStatement("SELECT theme FROM get_chatroom_theme(?) AS theme");
 			st.setInt(1, Integer.parseInt(id));
@@ -370,8 +362,7 @@ public class Database{
 		return rs;
 	}
 
-	public static void addChatRoom(String theme, String creator) throws SQLException{
-		Connection con = getConnection();
+	public static void addChatRoom(Connection con, String theme, String creator) throws SQLException{
 		if(con!=null){
 			PreparedStatement st = con.prepareStatement("SELECT add_chatroom(?,?)");
 			st.setString(1, creator);
@@ -384,9 +375,11 @@ public class Database{
 	public static boolean addPM(String from, String to,String text,String attach, String time){
 
 		System.out.println("FROM "+from+ " TO "+to+" TEXT "+text+" PATH "+attach+" TIME "+time);
+		Connection con = null;
 		try{
-			Connection con = getConnection();
+			con = getConnection();
 			if(con!=null){
+				con.setAutoCommit(false);
 				PreparedStatement st= null;
 				if(time == null)
 					st = con.prepareStatement("SELECT add_pm(?,?,?,?);");
@@ -411,19 +404,29 @@ public class Database{
 				}
 				
 				st.execute();
+				con.commit();
+				con.setAutoCommit(true);
 				putConnection(con);
 			}
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
+			try{
+				con.rollback();
+				con.setAutoCommit(true);
+			}
+			catch(SQLException e_){System.out.println("Rolling back: "+e_);}
+			putConnection(con);
 		}		
 		return true;
 	}
 	
 	
 	public static void updateProfile(String user, String pass, String city_name, Integer id_country, String name, String birthdate, String email, Boolean gender_male, String address, Boolean public_){
+		Connection con = null;
 		try{
-			Connection con = getConnection();
+			con = getConnection();
 			if(con!=null){
+				con.setAutoCommit(false);
 				PreparedStatement st = con.prepareStatement("SELECT update_profile(?,?,?,?,?,"+birthdate+",?,?,?,?)");
 				st.setString(1, user);
 				st.setString(2, pass);
@@ -444,10 +447,18 @@ public class Database{
 				else 			st.setNull(9, java.sql.Types.BOOLEAN);				
 
 				st.execute();
+				con.commit();
+				con.setAutoCommit(true);
 				putConnection(con);
 			}       
 		}catch( java.sql.SQLException e){
 			System.out.println(e);
+			try{
+				con.rollback();
+				con.setAutoCommit(true);
+			}
+			catch(SQLException e_){System.out.println("Rolling back: "+e_);}
+			putConnection(con);			
 		}               
 	}
 
@@ -507,9 +518,9 @@ public class Database{
 		return rs;
 	}
 
-	public static void addPost(Integer id_chatroom, String source, String text, Integer parent, String filePath, Integer rlevel) throws SQLException{
-		Connection con = getConnection();
+	public static void addPost(Connection con, Integer id_chatroom, String source, String text, Integer parent, String filePath, Integer rlevel) throws SQLException{
 		if(con!=null){
+			con.setAutoCommit(false);
 			PreparedStatement st = con.prepareStatement("SELECT add_post(?,?,?,?,?,?);");
 			if(id_chatroom != null) st.setInt(1, id_chatroom);
 			else 					st.setNull(1, java.sql.Types.INTEGER);				
@@ -526,11 +537,12 @@ public class Database{
 			else 			   st.setNull(6, java.sql.Types.INTEGER);				
 
 			st.execute();
+			con.commit();
+			con.setAutoCommit(true);
 			putConnection(con);
 		}	
 	}
-	public static void deletePost(int id,String from) throws SQLException{
-		Connection con = getConnection();
+	public static void deletePost(Connection con, int id,String from) throws SQLException{
 		if(con!=null){
 			PreparedStatement st = con.prepareStatement("SELECT delete_post(?,?);");
 			st.setInt(1, id);
@@ -541,8 +553,7 @@ public class Database{
 		}	
 	}
 
-	public static void deletePM(int id,String from) throws SQLException{
-		Connection con = getConnection();
+	public static void deletePM(Connection con, int id,String from) throws SQLException{
 		if(con!=null){
 			PreparedStatement st = con.prepareStatement("SELECT delete_pm(?,?);");
 			st.setInt(1, id);
@@ -571,33 +582,32 @@ public class Database{
 		return rs;
 	}	
 
-	public static void deleteInfo(String user)throws SQLException{
-		Connection con = getConnection();
+	public static void deleteInfo(Connection con, String user)throws SQLException{
 		if(con!=null){
+			con.setAutoCommit(false);
 			PreparedStatement st = con.prepareStatement("SELECT delete_activity(?);");
 			st.setString(1, user);
 			st.execute();
+			con.commit();
+			con.setAutoCommit(true);
 			putConnection(con);
 		}
 	}
 
-	public static void addRate(String user, int chatroom,String rate) throws java.sql.SQLException{
-		ResultSet rs = null;
+	public static void addRate(Connection con, String user, int chatroom,String rate) throws SQLException{
 		System.out.println(user + chatroom + rate);
-		try{
-			Connection con = getConnection();
-			if(con!=null){
-				PreparedStatement st = con.prepareStatement("SELECT * FROM rate_chatroom(?,?,?);");
-				st.setString(1, user);
-				st.setInt(2, chatroom);			     
-				st.setString(3,rate);
+		if(con!=null){
+			con.setAutoCommit(false);
+			PreparedStatement st = con.prepareStatement("SELECT * FROM rate_chatroom(?,?,?);");
+			st.setString(1, user);
+			st.setInt(2, chatroom);			     
+			st.setString(3,rate);
 
-				st.execute();
-				putConnection(con);
-			}
-		}catch( java.sql.SQLException e){
-			System.out.println(e);
-		}		
+			st.execute();
+			con.commit();
+			con.setAutoCommit(true);
+			putConnection(con);
+		}	
 	}	
 
 }

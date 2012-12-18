@@ -118,20 +118,13 @@ END;
 $$
 LANGUAGE plpgsql;
 
-
---REMOVE_MESSAGE()
-CREATE OR REPLACE FUNCTION remove_message(id integer) RETURNS BOOLEAN AS $$
-DECLARE
-	read_ boolean;
+-- DELETE_PM()
+CREATE OR REPLACE FUNCTION delete_pm(idpm integer,userlogin varchar)
+RETURNS VOID AS $$
 BEGIN
-	SELECT read INTO read_ FROM pm WHERE id_message=id;
-	IF read_ IS false THEN
-		DELETE FROM pm WHERE id_message = id;
-		DELETE FROM message WHERE id_message=id;
-	END IF;
-	RETURN NOT read_;
-	EXCEPTION WHEN OTHERS THEN
-		RAISE EXCEPTION 'system error';
+       DELETE FROM message WHERE "from" LIKE userlogin AND id_message IN (SELECT id_message FROM pm WHERE read=false AND id_message=idpm);
+       EXCEPTION WHEN OTHERS THEN
+               RAISE EXCEPTION 'system error';
 END;
 $$
 LANGUAGE plpgsql;

@@ -22,11 +22,18 @@ public class NewPostSv extends HttpServlet {
 			file.write( currentPath + filePath );
 		}
 
+		Connection con = Database.getConnection();
 		try{
-			Database.addPost( id_chatroom, src, text, null, filePath, 0);
+			Database.addPost(con, id_chatroom, src, text, null, filePath, 0);
 			response.sendRedirect("chat?id="+id_chatroom);
 		}
 		catch(SQLException e){
+			try{
+				con.rollback();
+				con.setAutoCommit(true);
+			}
+			catch(SQLException e_){System.out.println("Rolling back: "+e_);}
+			Database.putConnection(con);
 			response.sendRedirect("chat.jsp?msg="+e.getMessage());
 		}
 
